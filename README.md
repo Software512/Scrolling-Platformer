@@ -1,2 +1,2 @@
-# Scrolling-Platformer
-A work in progress
+# Scrolling Platformer
+A work in progress.
