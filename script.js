@@ -23,8 +23,6 @@ var upDown = false;
 var onGround = false;
 var inAir;
 
-x = level[levelNumber].startX;
-y = level[levelNumber].startY;
 
 resize();
 
@@ -46,6 +44,8 @@ function resize() {
     canvas.height = height;
 }
 
+document.getElementById("play").addEventListener("click", startGame);
+
 document.addEventListener("keydown", (e) => {
     if (e.key == "ArrowLeft") {
         leftDown = true;
@@ -65,6 +65,13 @@ document.addEventListener("keyup", (e) => {
         upDown = false;
     }
 });
+
+function startGame() {
+    document.getElementById("mainMenu").style.display = "none";
+    x = level[levelNumber].startX;
+    y = level[levelNumber].startY;
+    gameLoop();
+}
 
 function gameLoop() {
     startTime = performance.now();
@@ -140,5 +147,3 @@ function gameLoop() {
 
     timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
 }
-
-gameLoop();

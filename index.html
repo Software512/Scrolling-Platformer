@@ -9,10 +9,30 @@
             background-color: black;
             margin: 0;
             text-align: center;
+            font-family: "Press Start 2P", sans-serif;
         }
 
         #canvas {
             background-color: white;
+            position: fixed;
+        }
+
+        @media (aspect-ratio > 4/3) {
+            #mainMenu {
+                height: 100vh;
+                left: calc((100vw - (100vh * 4 / 3)) / 2);
+            }
+        }
+
+        @media (aspect-ratio <= 4/3) {
+            #mainMenu {
+                width: 100vw;
+                top: calc((100vh - (100vw * 3 / 4)) / 2);
+            }
+        }
+
+        #mainMenu {
+            aspect-ratio: 4/3;
             position: fixed;
         }
     </style>
@@ -20,7 +40,17 @@
 
 <body>
     <canvas id="canvas"></canvas>
+    <div id="mainMenu">
+        <h1>Scrolling Platformer</h1>
+        <button id="play">Play</button>
+    </div>
+
     <script src="script.js"></script>
+
+    <!-- Used to get the font for the game -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </body>
 
 </html>
