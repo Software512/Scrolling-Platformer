@@ -20,6 +20,7 @@ var inAir;
 var editMode;
 var mouseX;
 var mouseY;
+var currentTile = "dirt";
 
 
 resize();
@@ -49,8 +50,9 @@ document.getElementById("play").addEventListener("click", () => {
 
 document.getElementById("newGame").addEventListener("click", () => {
     editMode = true;
-    //document.getElementById("objectSelector").style.display = "";
+    document.getElementById("editorMenu").style.display = "";
     startGame();
+    currentTile = "dirt";
 });
 
 document.addEventListener("keydown", (e) => {
@@ -78,6 +80,12 @@ canvas.addEventListener("mousemove", (e) => {
     mouseY = e.offsetY;
 });
 
+for (option of document.querySelectorAll(".objectButton")) {
+    option.addEventListener("click", (e) => {
+        currentTile = e.target.id;
+    });
+}
+
 document.getElementById("canvas").addEventListener("click", () => {
     if (editMode) {
         let i = 0;
@@ -91,7 +99,9 @@ document.getElementById("canvas").addEventListener("click", () => {
             }
             i++;
         }
-        level.objects.push({ x: (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5, y: (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5, type: "dirt" });
+        if (currentTile != "eraser") {
+            level.objects.push({ x: (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5, y: (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5, type: currentTile });
+        }
     }
 });
 
@@ -106,10 +116,10 @@ function gameLoop() {
     startTime = performance.now();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (xVelocity < 1 && rightDown) {
+    if (xVelocity < 0.75 && rightDown) {
         xVelocity += 0.2;
     }
-    if (xVelocity > -1 && leftDown) {
+    if (xVelocity > -0.75 && leftDown) {
         xVelocity -= 0.2;
     }
     if (Math.sign(xVelocity) == 1) {
@@ -120,7 +130,7 @@ function gameLoop() {
     }
     xVelocity = Math.round(xVelocity * 1000) / 1000
     for (wall of level.objects) {
-        if (wall.type = "dirt") {
+        if (wall.type == "dirt") {
             if (
                 x < wall.x + 5 &&
                 x + 4 > wall.x &&
@@ -140,7 +150,7 @@ function gameLoop() {
         yVelocity = 1;
         onGround = false;
     }
-    if (!onGround) {
+    if (!onGround && yVelocity > -5) {
         yVelocity -= 0.04
     }
     if (yVelocity > 0) {
@@ -180,13 +190,12 @@ function gameLoop() {
     ctx.globalAlpha = 1;
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
-        if (wall.type == "dirt") {
-            ctx.drawImage(document.getElementById("dirt"), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
-        }
+        ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+
     }
     if (editMode) {
         ctx.globalAlpha = 0.5;
-        ctx.drawImage(document.getElementById("dirt"), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - 0.025) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - 0.025) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
     }
 
 

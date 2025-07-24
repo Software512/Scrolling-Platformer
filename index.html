@@ -18,22 +18,43 @@
         }
 
         @media (aspect-ratio > 4/3) {
-            #mainMenu {
+            #mainMenu, #editorMenu {
                 height: 100vh;
                 left: calc((100vw - (100vh * 4 / 3)) / 2);
             }
         }
 
-        @media (aspect-ratio <= 4/3) {
-            #mainMenu {
+        @media (aspect-ratio <=4/3) {
+            #mainMenu, #editorMenu {
                 width: 100vw;
                 top: calc((100vh - (100vw * 3 / 4)) / 2);
             }
         }
 
-        #mainMenu {
+        #mainMenu, #editorMenu {
             aspect-ratio: 4/3;
             position: fixed;
+        }
+
+        #editorMenu {
+            pointer-events: none;
+        }
+
+        #objectSelector {
+            width: 75%;
+            height: 10%;
+            background-color: #eee;
+            left: 12.5%;
+            position: absolute;
+            bottom: 1%;
+            border-radius: 2% / 20%;
+
+        }
+
+        .objectButton {
+            width: 7.5%;
+            padding-top: 1.25%;
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -45,9 +66,14 @@
         <button id="play">Play</button>
         <button id="newGame">Make a New Game</button>
     </div>
-    <div id="objectSelector" style="display: none;">
-        <img id="dirt" src="assets/dirt.webp">
+    <div id="editorMenu" style="display: none;">
+        <div id="objectSelector">
+            <img id="dirt" class="objectButton" src="assets/dirt.webp">
+            <img id="grass" class="objectButton" src="assets/grass.webp">
+            <img id="eraser" class="objectButton" src="assets/eraser.webp">
+        </div>
     </div>
+
 
     <script src="script.js"></script>
 
