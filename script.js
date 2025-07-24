@@ -4,8 +4,8 @@ const ctx = canvas.getContext("2d");
 
 var level = {
     objects: [
-        { x: 0, y: -5, type: "wall" },
-        { x: -20, y: 5, type: "wall" }
+        { x: 0, y: -5, type: "dirt" },
+        { x: -20, y: 5, type: "dirt" }
     ]
 };
 var x;
@@ -49,6 +49,7 @@ document.getElementById("play").addEventListener("click", () => {
 
 document.getElementById("newGame").addEventListener("click", () => {
     editMode = true;
+    //document.getElementById("objectSelector").style.display = "";
     startGame();
 });
 
@@ -77,9 +78,26 @@ canvas.addEventListener("mousemove", (e) => {
     mouseY = e.offsetY;
 });
 
+document.getElementById("canvas").addEventListener("click", () => {
+    if (editMode) {
+        let i = 0;
+        for (object of level.objects) {
+            if (
+                object.x == (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5 &&
+                object.y == (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5
+            ) {
+                level.objects.splice(i, 1);
+                break;
+            }
+            i++;
+        }
+        level.objects.push({ x: (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5, y: (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5, type: "dirt" });
+    }
+});
+
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
-    x = 0;
+    x = 0.5;
     y = 0;
     gameLoop();
 }
@@ -102,12 +120,12 @@ function gameLoop() {
     }
     xVelocity = Math.round(xVelocity * 1000) / 1000
     for (wall of level.objects) {
-        if (wall.type = "wall") {
+        if (wall.type = "dirt") {
             if (
                 x < wall.x + 5 &&
-                x + 5 > wall.x &&
+                x + 4 > wall.x &&
                 y - 0.04 < wall.y + 5 &&
-                y - 0.04 + 5 > wall.y
+                y - 0.04 + 4 > wall.y
             ) {
                 onGround = true;
                 yVelocity = 0;
@@ -127,12 +145,12 @@ function gameLoop() {
     }
     if (yVelocity > 0) {
         for (wall of level.objects) {
-            if (wall.type == "wall") {
+            if (wall.type == "dirt") {
                 if (
                     x < wall.x + 5 &&
-                    x + 5 > wall.x &&
+                    x + 4 > wall.x &&
                     y + yVelocity < wall.y + 5 &&
-                    y + yVelocity + 5 > wall.y
+                    y + yVelocity + 4 > wall.y
                 ) {
                     yVelocity = 0;
                     break;
@@ -140,14 +158,15 @@ function gameLoop() {
             }
         }
     }
+    // Normalization? no
     y += yVelocity
     for (wall of level.objects) {
-        if (wall.type == "wall") {
+        if (wall.type == "dirt") {
             if (
                 x + xVelocity < wall.x + 5 &&
-                x + xVelocity + 5 > wall.x &&
+                x + xVelocity + 4 > wall.x &&
                 y < wall.y + 5 &&
-                y + 5 > wall.y
+                y + 4 > wall.y
             ) {
                 xVelocity = 0;
                 break;
@@ -159,17 +178,15 @@ function gameLoop() {
 
     ctx.fillStyle = "black";
     ctx.globalAlpha = 1;
-    ctx.fillRect(width / 2 - height / 40, height * 0.475, height / 20, height / 20);
+    ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
-        if (wall.type == "wall") {
-            ctx.fillStyle = "orange";
-            ctx.fillRect((wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+        if (wall.type == "dirt") {
+            ctx.drawImage(document.getElementById("dirt"), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
         }
     }
     if (editMode) {
         ctx.globalAlpha = 0.5;
-        ctx.fillStyle = "orange";
-        ctx.fillRect(Math.floor(mouseX / width * 20) * width / 20, Math.floor(mouseY / height * 20) * height / 20, height / 20, height / 20);
+        ctx.drawImage(document.getElementById("dirt"), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - 0.025) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
     }
 
 
