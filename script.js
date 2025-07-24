@@ -15,7 +15,9 @@ var yVelocity = 0;
 var leftDown = false;
 var rightDown = false;
 var upDown = false;
+var downDown = false;
 var onGround = false;
+var fly = false;
 var inAir;
 var editMode;
 var mouseX;
@@ -62,6 +64,8 @@ document.addEventListener("keydown", (e) => {
         rightDown = true;
     } else if (e.key == "ArrowUp") {
         upDown = true;
+    } else if (e.key == "ArrowDown") {
+        downDown = true;
     }
 });
 
@@ -72,6 +76,8 @@ document.addEventListener("keyup", (e) => {
         rightDown = false;
     } else if (e.key == "ArrowUp") {
         upDown = false;
+    } else if (e.key == "ArrowDown") {
+        downDown = false;
     }
 });
 
@@ -86,6 +92,19 @@ for (option of document.querySelectorAll(".objectButton")) {
     });
 }
 
+document.getElementById("goToStart").addEventListener("click", () => {
+    x = 0.5;
+    y = 0;
+});
+
+document.getElementById("fly").addEventListener("input", (e) => {
+    if (e.target.checked) {
+        fly = true;
+    } else {
+        fly = false;
+    }
+});
+
 document.getElementById("canvas").addEventListener("click", () => {
     if (editMode) {
         let i = 0;
@@ -94,7 +113,7 @@ document.getElementById("canvas").addEventListener("click", () => {
                 object.x == (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5 &&
                 object.y == (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5
             ) {
-                level.objects.splice(i, 1);
+                if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
                 break;
             }
             i++;
@@ -107,8 +126,10 @@ document.getElementById("canvas").addEventListener("click", () => {
 
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
+    document.getElementById("fly").checked = "";
     x = 0.5;
     y = 0;
+    fly = false;
     gameLoop();
 }
 
@@ -116,75 +137,104 @@ function gameLoop() {
     startTime = performance.now();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (xVelocity < 0.75 && rightDown) {
-        xVelocity += 0.2;
-    }
-    if (xVelocity > -0.75 && leftDown) {
-        xVelocity -= 0.2;
-    }
-    if (Math.sign(xVelocity) == 1) {
-        xVelocity -= 0.1;
-    }
-    if (Math.sign(xVelocity) == -1) {
-        xVelocity += 0.1;
-    }
-    xVelocity = Math.round(xVelocity * 1000) / 1000
-    for (wall of level.objects) {
-        if (wall.type == "dirt") {
-            if (
-                x < wall.x + 5 &&
-                x + 4 > wall.x &&
-                y - 0.04 < wall.y + 5 &&
-                y - 0.04 + 4 > wall.y
-            ) {
-                onGround = true;
-                yVelocity = 0;
-                y = wall.y + 5;
-                break;
-            }
-            onGround = false;
+    if (!fly) {
+        if (xVelocity < 0.75 && rightDown) {
+            xVelocity += 0.2;
         }
-
-    }
-    if (onGround && upDown) {
-        yVelocity = 1;
-        onGround = false;
-    }
-    if (!onGround && yVelocity > -5) {
-        yVelocity -= 0.04
-    }
-    if (yVelocity > 0) {
+        if (xVelocity > -0.75 && leftDown) {
+            xVelocity -= 0.2;
+        }
+        if (Math.sign(xVelocity) == 1) {
+            xVelocity -= 0.1;
+        }
+        if (Math.sign(xVelocity) == -1) {
+            xVelocity += 0.1;
+        }
+        xVelocity = Math.round(xVelocity * 1000) / 1000
         for (wall of level.objects) {
-            if (wall.type == "dirt") {
+            if (wall.type == "dirt" || wall.type == "grass") {
                 if (
                     x < wall.x + 5 &&
                     x + 4 > wall.x &&
-                    y + yVelocity < wall.y + 5 &&
-                    y + yVelocity + 4 > wall.y
+                    y - 0.04 < wall.y + 5 &&
+                    y - 0.04 + 4 > wall.y
                 ) {
+                    onGround = true;
                     yVelocity = 0;
+                    y = wall.y + 5;
                     break;
+                }
+                onGround = false;
+            }
+
+        }
+        if (onGround && upDown) {
+            yVelocity = 1;
+            onGround = false;
+        }
+        if (!onGround && yVelocity > -5) {
+            yVelocity -= 0.04
+        }
+        if (yVelocity > 0) {
+            for (wall of level.objects) {
+                if (wall.type == "dirt" || wall.type == "grass") {
+                    if (
+                        x < wall.x + 5 &&
+                        x + 4 > wall.x &&
+                        y + yVelocity < wall.y + 5 &&
+                        y + yVelocity + 4 > wall.y
+                    ) {
+                        yVelocity = 0;
+                        break;
+                    }
                 }
             }
         }
-    }
-    // Normalization? no
-    y += yVelocity
-    for (wall of level.objects) {
-        if (wall.type == "dirt") {
-            if (
-                x + xVelocity < wall.x + 5 &&
-                x + xVelocity + 4 > wall.x &&
-                y < wall.y + 5 &&
-                y + 4 > wall.y
-            ) {
-                xVelocity = 0;
-                break;
+        // Normalization? no
+        y += yVelocity
+        for (wall of level.objects) {
+            if (wall.type == "dirt" || wall.type == "grass") {
+                if (
+                    x + xVelocity < wall.x + 5 &&
+                    x + xVelocity + 4 > wall.x &&
+                    y < wall.y + 5 &&
+                    y + 4 > wall.y
+                ) {
+                    xVelocity = 0;
+                    break;
+                }
             }
-        }
 
+        }
+        x += xVelocity;
+        for (wall of level.objects) {
+            if (wall.type == "spring") {
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y < wall.y + 3.125 &&
+                    y + 4 > wall.y
+                ) {
+                    yVelocity = 2;
+                    break;
+                }
+            }
+
+        }
+    } else {
+        if (leftDown) {
+            x -= 1;
+        }
+        if (rightDown) {
+            x += 1;
+        }
+        if (upDown) {
+            y += 1;
+        }
+        if (downDown) {
+            y -= 1;
+        }
     }
-    x += xVelocity;
 
     ctx.fillStyle = "black";
     ctx.globalAlpha = 1;
@@ -195,7 +245,7 @@ function gameLoop() {
     }
     if (editMode) {
         ctx.globalAlpha = 0.5;
-        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - 0.025) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height -  ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
     }
 
 

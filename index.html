@@ -18,20 +18,25 @@
         }
 
         @media (aspect-ratio > 4/3) {
-            #mainMenu, #editorMenu {
+
+            #mainMenu,
+            #editorMenu {
                 height: 100vh;
                 left: calc((100vw - (100vh * 4 / 3)) / 2);
             }
         }
 
         @media (aspect-ratio <=4/3) {
-            #mainMenu, #editorMenu {
+
+            #mainMenu,
+            #editorMenu {
                 width: 100vw;
                 top: calc((100vh - (100vw * 3 / 4)) / 2);
             }
         }
 
-        #mainMenu, #editorMenu {
+        #mainMenu,
+        #editorMenu {
             aspect-ratio: 4/3;
             position: fixed;
         }
@@ -48,7 +53,32 @@
             position: absolute;
             bottom: 1%;
             border-radius: 2% / 20%;
+        }
 
+        #editOptions {
+            width: 90%;
+            height: 5%;
+            background-color: #eee;
+            left: 5%;
+            position: absolute;
+            top: 1%;
+            border-radius: 1% / 24%;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            padding-inline: 1%;
+        }
+
+        #editOptions * {
+            margin-left: 1%;
+        }
+
+        #flyBox {
+            margin-inline: auto 1%;
+        }
+
+        #flyBox * {
+            margin-left: 0;
         }
 
         .objectButton {
@@ -64,12 +94,25 @@
     <div id="mainMenu">
         <h1>Scrolling Platformer</h1>
         <button id="play">Play</button>
-        <button id="newGame">Make a New Game</button>
+        <button id="newGame">Make a New Level</button>
+        <button id="load">Load a Level</button>
     </div>
     <div id="editorMenu" style="display: none;">
+        <div id="editOptions">
+            <button id="leaveEditor">Quit</button>
+            <button id="testGame">Play</button>
+            <button id="goToStart">Go To Start</button>
+            <button id="save">Save</button>
+            <button id="loadToEditor">Load</button>
+            <div id="flyBox">
+                <label id="flyLabel" for="fly">Fly and Noclip in editor</label>
+                <input id="fly" type="checkbox">
+            </div>
+        </div>
         <div id="objectSelector">
             <img id="dirt" class="objectButton" src="assets/dirt.webp">
             <img id="grass" class="objectButton" src="assets/grass.webp">
+            <img id="spring" class="objectButton" src="assets/spring.webp">
             <img id="eraser" class="objectButton" src="assets/eraser.webp">
         </div>
     </div>
