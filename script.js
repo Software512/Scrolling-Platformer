@@ -1,4 +1,3 @@
-// TODO: collision detection
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -66,6 +65,9 @@ document.addEventListener("keydown", (e) => {
         upDown = true;
     } else if (e.key == "ArrowDown") {
         downDown = true;
+    } else if (e.key == "r") {
+        x = 0.5;
+        y = 0;
     }
 });
 
@@ -105,21 +107,68 @@ document.getElementById("fly").addEventListener("input", (e) => {
     }
 });
 
+document.getElementById("save").addEventListener("click", () => {
+    let compressedData;
+    let saveCode = "";
+    compressString(JSON.stringify(level)).then((compressed) => {
+        compressedData = compressed;
+        for (character of compressedData) {
+            saveCode += (character.toString(16).length == 1 ? "0" : "") + character.toString(16);
+        }
+        prompt("This is the save code for this level. Copy it and keep it somewhere safe.", saveCode);
+    });
+});
+
+document.getElementById("loadToEditor").addEventListener("click", load);
+
+document.getElementById("load").addEventListener("click", () => {
+    load();
+});
+
+async function load() {
+    try {
+        let saveCodeCompressed = prompt("Paste your save code here.");
+        let array = [];
+        for (byte of [...saveCodeCompressed.matchAll(/../g)]) {
+            array.push(Number("0x" + byte[0]));
+        }
+        let uint8arrayCompressed = new Uint8Array(array);
+        let saveCode = await decompressString(uint8arrayCompressed);
+        level = JSON.parse(saveCode);
+        if (!editMode) {
+            startGame();
+        }
+    } catch {
+        alert("Invalid save code.");
+    }
+}
+
 document.getElementById("canvas").addEventListener("click", () => {
     if (editMode) {
-        let i = 0;
-        for (object of level.objects) {
-            if (
-                object.x == (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5 &&
-                object.y == (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5
-            ) {
-                if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
-                break;
+        let tileX = (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5;
+        let tileY = (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y < 0 ? 1 : 0)) * 5;
+        if (
+            !(x < tileX + 5 &&
+                x + 4 > tileX &&
+                y < tileY + 5 &&
+                y + 4 > tileY
+            ) &&
+            !(tileX == 0 && tileY == 0)
+        ) {
+            let i = 0;
+            for (object of level.objects) {
+                if (
+                    object.x == tileX &&
+                    object.y == tileY
+                ) {
+                    if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
+                    break;
+                }
+                i++;
             }
-            i++;
-        }
-        if (currentTile != "eraser") {
-            level.objects.push({ x: (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) - 12 + Math.floor(x / 5)) * 5, y: (-Math.floor((mouseY / height - 0.025) * 20) + Math.floor(y / 5) + 9) * 5, type: currentTile });
+            if (currentTile != "eraser") {
+                level.objects.push({ x: tileX, y: tileY, type: currentTile });
+            }
         }
     }
 });
@@ -215,7 +264,7 @@ function gameLoop() {
                     y < wall.y + 3.125 &&
                     y + 4 > wall.y
                 ) {
-                    yVelocity = 2;
+                    yVelocity = 1.75;
                     break;
                 }
             }
@@ -245,10 +294,68 @@ function gameLoop() {
     }
     if (editMode) {
         ctx.globalAlpha = 0.5;
-        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height -  ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
     }
 
 
 
     timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
+}
+
+// All of the following code is AI-generated.
+
+async function compressString(input) {
+    // Convert the string to a Uint8Array
+    const encoder = new TextEncoder();
+    const inputData = encoder.encode(input);
+
+    // Create a CompressionStream for gzip
+    const compressionStream = new CompressionStream('gzip');
+    const writableStream = compressionStream.writable.getWriter();
+
+    // Write the data to the stream
+    writableStream.write(inputData);
+    writableStream.close();
+
+    // Read the compressed data
+    const compressedStream = compressionStream.readable;
+    const compressedChunks = [];
+    const reader = compressedStream.getReader();
+
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        compressedChunks.push(value);
+    }
+
+    // Combine chunks into a single Uint8Array
+    const compressedData = new Uint8Array(
+        compressedChunks.reduce((acc, chunk) => acc + chunk.length, 0)
+    );
+    let offset = 0;
+    for (const chunk of compressedChunks) {
+        compressedData.set(chunk, offset);
+        offset += chunk.length;
+    }
+
+    return compressedData;
+}
+
+async function decompressString(compressedData) {
+    // Convert the compressed string (Base64 or similar) back to a Uint8Array
+    //const compressedBytes = Uint8Array.from(atob(compressedData), c => c.charCodeAt(0));
+    const compressedBytes = compressedData;
+    // Create a DecompressionStream (e.g., for 'gzip')
+    const decompressionStream = new DecompressionStream('gzip');
+
+    // Create a stream from the compressed bytes
+    const compressedStream = new Response(compressedBytes).body;
+
+    // Pipe the compressed stream through the decompression stream
+    const decompressedStream = compressedStream.pipeThrough(decompressionStream);
+
+    // Convert the decompressed stream back to a string
+    const decompressedText = await new Response(decompressedStream).text();
+
+    return decompressedText;
 }
