@@ -53,6 +53,10 @@
             position: absolute;
             bottom: 1%;
             border-radius: 2% / 20%;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            pointer-events: auto;
         }
 
         #editOptions {
@@ -83,8 +87,12 @@
 
         .objectButton {
             width: 7.5%;
-            margin-top: 1.25%;
-            pointer-events: auto;
+        }
+
+        #lava {
+            object-position: 0 0;
+            object-fit: cover;
+            aspect-ratio: 1;
         }
     </style>
 </head>
@@ -114,6 +122,8 @@
             <img id="grass" class="objectButton" src="assets/grass.webp">
             <img id="spring" class="objectButton" src="assets/spring.webp">
             <img id="spike" class="objectButton" src="assets/spike.webp">
+            <img id="lava" class="objectButton" src="assets/lava.webp">
+            <img id="enemy" class="objectButton" src="assets/enemy.webp">
             <img id="eraser" class="objectButton" src="assets/eraser.webp">
         </div>
     </div>

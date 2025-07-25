@@ -1,7 +1,8 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-var level = {
+var level;
+var originalLevel = {
     objects: [
         { x: 0, y: -5, type: "dirt" },
         { x: -20, y: 5, type: "dirt" }
@@ -25,6 +26,7 @@ var currentTile = "dirt";
 var tileX;
 var tileY;
 var mousedown = false;
+var timePassed = 0;
 
 
 resize();
@@ -78,6 +80,7 @@ document.addEventListener("keydown", (e) => {
     } else if (e.key == "r") {
         x = 0.5;
         y = 0;
+        level = JSON.parse(JSON.stringify(originalLevel));
     }
 });
 
@@ -126,7 +129,7 @@ document.getElementById("fly").addEventListener("input", (e) => {
 document.getElementById("save").addEventListener("click", () => {
     let compressedData;
     let saveCode = "";
-    compressString(JSON.stringify(level)).then((compressed) => {
+    compressString(JSON.stringify(originalLevel)).then((compressed) => {
         compressedData = compressed;
         for (character of compressedData) {
             saveCode += (character.toString(16).length == 1 ? "0" : "") + character.toString(16);
@@ -138,7 +141,10 @@ document.getElementById("save").addEventListener("click", () => {
 
 document.getElementById("loadToEditor").addEventListener("click", load);
 
-document.getElementById("load").addEventListener("click", load);
+document.getElementById("load").addEventListener("click", () => {
+    mode = 0;
+    load();
+});
 
 async function load() {
     try {
@@ -150,7 +156,8 @@ async function load() {
             i++;
         }
         let saveCode = await decompressString(uint8arrayCompressed);
-        level = JSON.parse(saveCode);
+        originalLevel = JSON.parse(saveCode);
+        level = JSON.parse(JSON.stringify(originalLevel));
         if (mode != 1) {
             startGame();
         }
@@ -188,19 +195,20 @@ function placeTile() {
                 tileY >= -125
             ) {
                 let i = 0;
-                for (object of level.objects) {
+                for (object of originalLevel.objects) {
                     if (
                         object.x == tileX &&
                         object.y == tileY
                     ) {
-                        if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
+                        if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) originalLevel.objects.splice(i, 1);
                         break;
                     }
                     i++;
                 }
                 if (currentTile != "eraser") {
-                    level.objects.push({ x: tileX, y: tileY, type: currentTile });
+                    originalLevel.objects.push({ x: tileX, y: tileY, type: currentTile });
                 }
+                level = JSON.parse(JSON.stringify(originalLevel));
             }
         }
     }
@@ -209,6 +217,7 @@ function placeTile() {
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
     document.getElementById("fly").checked = "";
+    level = JSON.parse(JSON.stringify(originalLevel));
     x = 0.5;
     y = 0;
     fly = false;
@@ -320,6 +329,52 @@ function gameLoop() {
                 if (detectCollision(square, triangle)) {
                     x = 0.5;
                     y = 0;
+                    level = Object.assign({}, originalLevel);
+                }
+            } else if (wall.type == "lava") {
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y < wall.y + 4.375 &&
+                    y + 4 > wall.y
+                ) {
+                    x = 0.5;
+                    y = 0;
+                    level = JSON.parse(JSON.stringify(originalLevel));
+                }
+            } else if (wall.type == "enemy") {
+                if (mode != 1) {
+                    if (!wall.direction) {
+                        wall.direction = 1;
+                    }
+                    let atLedge = true;
+                    for (notGap of level.objects) {
+                        if (
+                            Math.round(notGap.x / 5) == (wall.direction == -1 ? Math.floor((wall.x + wall.direction / 10) / 5) : Math.ceil((wall.x + wall.direction / 5) / 5)) &&
+                            notGap.y == wall.y - 5
+                        ) {
+                            atLedge = false;
+                        }
+                        if (
+                            notGap.x / 5 == (wall.direction == -1 ? Math.floor((wall.x + wall.direction / 10) / 5) : Math.ceil((wall.x + wall.direction / 5) / 5)) &&
+                            notGap.y == wall.y
+                        ) {
+                            atLedge = true;
+                            break;
+                        }
+                    }
+                    if (atLedge) wall.direction = -wall.direction;
+                    wall.x += wall.direction / 5;
+                }
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y < wall.y + 5 &&
+                    y + 4 > wall.y
+                ) {
+                    x = 0.5;
+                    y = 0;
+                    level = JSON.parse(JSON.stringify(originalLevel));
                 }
             }
         }
@@ -341,6 +396,7 @@ function gameLoop() {
     if (y < -125) {
         x = 0.5;
         y = 0;
+        level = JSON.parse(JSON.stringify(originalLevel));
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -348,16 +404,24 @@ function gameLoop() {
     ctx.globalAlpha = 1;
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
-        ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
-
+        if (wall.type == "lava") {
+            ctx.drawImage(document.getElementById(wall.type), Math.floor(timePassed) * 512, 0, 512, 512, (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+        } else {
+            ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+        }
     }
     if (mode == 1) {
         ctx.globalAlpha = 0.5;
-        ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        if (currentTile == "lava") {
+            ctx.drawImage(document.getElementById(currentTile), Math.floor(timePassed) * 512, 0, 512, 512, Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        } else {
+            ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
+        }
+        
     }
 
 
-
+    timePassed = (timePassed + 0.25) % 8;
     if (mode != -1) {
         timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
     } else {
