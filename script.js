@@ -18,7 +18,7 @@ var downDown = false;
 var onGround = false;
 var fly = false;
 var inAir;
-var editMode;
+var mode = -1;
 var mouseX;
 var mouseY;
 var currentTile = "dirt";
@@ -48,16 +48,22 @@ function resize() {
 }
 
 document.getElementById("play").addEventListener("click", () => {
-    editMode = false;
+    mode = 0;
     startGame();
 });
 
 document.getElementById("newGame").addEventListener("click", () => {
-    editMode = true;
+    mode = 1;
     document.getElementById("editorMenu").style.display = "";
     startGame();
     currentTile = "dirt";
     document.getElementById("dirt").style.boxShadow = "0 0 5px 5px #ccc";
+});
+
+document.getElementById("leaveEditor").addEventListener("click", () => {
+    mode = -1;
+    document.getElementById("editorMenu").style.display = "none";
+    document.getElementById("mainMenu").style.display = "";
 });
 
 document.addEventListener("keydown", (e) => {
@@ -125,27 +131,27 @@ document.getElementById("save").addEventListener("click", () => {
         for (character of compressedData) {
             saveCode += (character.toString(16).length == 1 ? "0" : "") + character.toString(16);
         }
-        prompt("This is the save code for this level. Copy it and keep it somewhere safe.", saveCode);
+        navigator.clipboard.writeText(saveCode);
+        alert("Save code copied to clipboard. Paste it somewhere safe.");
     });
 });
 
 document.getElementById("loadToEditor").addEventListener("click", load);
 
-document.getElementById("load").addEventListener("click", () => {
-    load();
-});
+document.getElementById("load").addEventListener("click", load);
 
 async function load() {
     try {
         let saveCodeCompressed = prompt("Paste your save code here.");
-        let array = [];
+        let uint8arrayCompressed = new Uint8Array(saveCodeCompressed.length / 2);
+        let i = 0;
         for (byte of [...saveCodeCompressed.matchAll(/../g)]) {
-            array.push(Number("0x" + byte[0]));
+            uint8arrayCompressed.set([Number("0x" + byte[0])], i);
+            i++;
         }
-        let uint8arrayCompressed = new Uint8Array(array);
         let saveCode = await decompressString(uint8arrayCompressed);
         level = JSON.parse(saveCode);
-        if (!editMode) {
+        if (mode != 1) {
             startGame();
         }
     } catch {
@@ -165,7 +171,7 @@ document.getElementById("canvas").addEventListener("mouseup", () => {
 document.getElementById("canvas").addEventListener("mousemove", placeTile);
 
 function placeTile() {
-    if (editMode && mousedown) {
+    if (mode == 1 && mousedown) {
         if (
             tileX != (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5 ||
             tileY != (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5
@@ -212,7 +218,6 @@ function startGame() {
 function gameLoop() {
     startTime = performance.now();
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!fly) {
         if (xVelocity < 0.75 && rightDown) {
             xVelocity += 0.2;
@@ -338,6 +343,7 @@ function gameLoop() {
         y = 0;
     }
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
     ctx.globalAlpha = 1;
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
@@ -345,14 +351,18 @@ function gameLoop() {
         ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
 
     }
-    if (editMode) {
+    if (mode == 1) {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
     }
 
 
 
-    timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
+    if (mode != -1) {
+        timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 }
 
 
