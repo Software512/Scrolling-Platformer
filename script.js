@@ -22,6 +22,9 @@ var editMode;
 var mouseX;
 var mouseY;
 var currentTile = "dirt";
+var tileX;
+var tileY;
+var mousedown = false;
 
 
 resize();
@@ -54,6 +57,7 @@ document.getElementById("newGame").addEventListener("click", () => {
     document.getElementById("editorMenu").style.display = "";
     startGame();
     currentTile = "dirt";
+    document.getElementById("dirt").style.boxShadow = "0 0 5px 5px #ccc";
 });
 
 document.addEventListener("keydown", (e) => {
@@ -90,6 +94,12 @@ canvas.addEventListener("mousemove", (e) => {
 
 for (option of document.querySelectorAll(".objectButton")) {
     option.addEventListener("click", (e) => {
+        for (otherOption of document.querySelectorAll(".objectButton")) {
+            otherOption.style.boxShadow = "";
+            otherOption.style.backgroundColor = "";
+        }
+        e.target.style.boxShadow = "0 0 5px 5px #ccc";
+        e.target.style.backgroundColor = "#ccc";
         currentTile = e.target.id;
     });
 }
@@ -143,35 +153,52 @@ async function load() {
     }
 }
 
-document.getElementById("canvas").addEventListener("click", () => {
-    if (editMode) {
-        let tileX = (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5;
-        let tileY = (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y < 0 ? 1 : 0)) * 5;
+document.getElementById("canvas").addEventListener("mousedown", () => {
+    mousedown = true;
+    placeTile();
+});
+
+document.getElementById("canvas").addEventListener("mouseup", () => {
+    mousedown = false;
+});
+
+document.getElementById("canvas").addEventListener("mousemove", placeTile);
+
+function placeTile() {
+    if (editMode && mousedown) {
         if (
-            !(x < tileX + 5 &&
-                x + 4 > tileX &&
-                y < tileY + 5 &&
-                y + 4 > tileY
-            ) &&
-            !(tileX == 0 && tileY == 0)
+            tileX != (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5 ||
+            tileY != (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5
         ) {
-            let i = 0;
-            for (object of level.objects) {
-                if (
-                    object.x == tileX &&
-                    object.y == tileY
-                ) {
-                    if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
-                    break;
+            tileX = (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5;
+            tileY = (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5;
+            if (
+                !(x < tileX + 5 &&
+                    x + 4 > tileX &&
+                    y < tileY + 5 &&
+                    y + 4 > tileY
+                ) &&
+                !(tileX == 0 && tileY == 0) &&
+                tileY >= -125
+            ) {
+                let i = 0;
+                for (object of level.objects) {
+                    if (
+                        object.x == tileX &&
+                        object.y == tileY
+                    ) {
+                        if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) level.objects.splice(i, 1);
+                        break;
+                    }
+                    i++;
                 }
-                i++;
-            }
-            if (currentTile != "eraser") {
-                level.objects.push({ x: tileX, y: tileY, type: currentTile });
+                if (currentTile != "eraser") {
+                    level.objects.push({ x: tileX, y: tileY, type: currentTile });
+                }
             }
         }
     }
-});
+}
 
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
@@ -267,8 +294,29 @@ function gameLoop() {
                     yVelocity = 1.75;
                     break;
                 }
-            }
+            } else if (wall.type == "spike") {
+                const square = {
+                    x: x, y: y, size: 4,
+                    corners: [
+                        { x: x, y: y },
+                        { x: x + 4, y: y },
+                        { x: x + 4, y: y + 4 },
+                        { x: x, y: y + 4 }
+                    ]
+                };
 
+                const triangle = {
+                    vertices: [
+                        { x: wall.x, y: wall.y },
+                        { x: wall.x + 5, y: wall.y },
+                        { x: wall.x + 2.5, y: wall.y + 5 }
+                    ]
+                };
+                if (detectCollision(square, triangle)) {
+                    x = 0.5;
+                    y = 0;
+                }
+            }
         }
     } else {
         if (leftDown) {
@@ -283,6 +331,11 @@ function gameLoop() {
         if (downDown) {
             y -= 1;
         }
+    }
+
+    if (y < -125) {
+        x = 0.5;
+        y = 0;
     }
 
     ctx.fillStyle = "black";
@@ -301,6 +354,7 @@ function gameLoop() {
 
     timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
 }
+
 
 // All of the following code is AI-generated.
 
@@ -358,4 +412,38 @@ async function decompressString(compressedData) {
     const decompressedText = await new Response(decompressedStream).text();
 
     return decompressedText;
+}
+
+
+// Helper function to check if a point is inside a triangle
+function isPointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+    const areaOrig = Math.abs((bx - ax) * (cy - ay) - (cx - ax) * (by - ay));
+    const area1 = Math.abs((ax - px) * (by - py) - (bx - px) * (ay - py));
+    const area2 = Math.abs((bx - px) * (cy - py) - (cx - px) * (by - py));
+    const area3 = Math.abs((cx - px) * (ay - py) - (ax - px) * (cy - py));
+    return areaOrig === (area1 + area2 + area3);
+}
+
+// Function to detect collision
+function detectCollision(square, triangle) {
+    // Check if any of the square's corners are inside the triangle
+    for (let corner of square.corners) {
+        if (isPointInTriangle(corner.x, corner.y, ...triangle.vertices)) {
+            return true;
+        }
+    }
+
+    // Check if any of the triangle's vertices are inside the square
+    for (let vertex of triangle.vertices) {
+        if (
+            vertex.x >= square.x &&
+            vertex.x <= square.x + square.size &&
+            vertex.y >= square.y &&
+            vertex.y <= square.y + square.size
+        ) {
+            return true;
+        }
+    }
+
+    return false;
 }
