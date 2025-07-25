@@ -69,13 +69,13 @@ document.getElementById("leaveEditor").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (e) => {
-    if (e.key == "ArrowLeft") {
+    if (e.key == "ArrowLeft" || e.key == "a") {
         leftDown = true;
-    } else if (e.key == "ArrowRight") {
+    } else if (e.key == "ArrowRight" || e.key == "d") {
         rightDown = true;
-    } else if (e.key == "ArrowUp") {
+    } else if (e.key == "ArrowUp" || e.key == "w") {
         upDown = true;
-    } else if (e.key == "ArrowDown") {
+    } else if (e.key == "ArrowDown" || e.key == "s") {
         downDown = true;
     } else if (e.key == "r") {
         x = 0.5;
@@ -85,13 +85,13 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.addEventListener("keyup", (e) => {
-    if (e.key == "ArrowLeft") {
+    if (e.key == "ArrowLeft" || e.key == "a") {
         leftDown = false;
-    } else if (e.key == "ArrowRight") {
+    } else if (e.key == "ArrowRight" || e.key == "d") {
         rightDown = false;
-    } else if (e.key == "ArrowUp") {
+    } else if (e.key == "ArrowUp" || e.key == "w") {
         upDown = false;
-    } else if (e.key == "ArrowDown") {
+    } else if (e.key == "ArrowDown" || e.key == "s") {
         downDown = false;
     }
 });
@@ -298,7 +298,7 @@ function gameLoop() {
         }
         x += xVelocity;
         for (wall of level.objects) {
-            if (wall.type == "spring") {
+            if (wall.type == "springup") {
                 if (
                     x < wall.x + 5 &&
                     x + 4 > wall.x &&
@@ -306,6 +306,16 @@ function gameLoop() {
                     y + 4 > wall.y
                 ) {
                     yVelocity = 1.75;
+                    break;
+                }
+            } else if (wall.type == "springdown") {
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y < wall.y + 5 &&
+                    y + 4 > wall.y + 1.875
+                ) {
+                    yVelocity = -1.75;
                     break;
                 }
             } else if (wall.type == "spike") {
@@ -405,9 +415,9 @@ function gameLoop() {
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
         if (wall.type == "lava") {
-            ctx.drawImage(document.getElementById(wall.type), Math.floor(timePassed) * 512, 0, 512, 512, (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+            ctx.drawImage(document.getElementById(wall.type), Math.floor(timePassed) * 512, 0, 512, 512, (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
         } else {
-            ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 20, height / 20);
+            ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
         }
     }
     if (mode == 1) {
