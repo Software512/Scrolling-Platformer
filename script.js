@@ -31,6 +31,8 @@ var mousedown = false;
 var moveOnTouch;
 var touchScreen = false;
 var timePassed = 0;
+var coins;
+var totalCoins;
 
 
 resize();
@@ -69,6 +71,16 @@ document.getElementById("newGame").addEventListener("click", () => {
 document.getElementById("leaveEditor").addEventListener("click", () => {
     mode = -1;
     document.getElementById("editorMenu").style.display = "none";
+    document.getElementById("mainMenu").style.display = "";
+});
+
+document.getElementById("edit").addEventListener("click", () => {
+    mode = -3;
+});
+
+document.getElementById("quit").addEventListener("click", () => {
+    mode = -1;
+    document.getElementById("ingameMenu").style.display = "none";
     document.getElementById("mainMenu").style.display = "";
 });
 
@@ -118,6 +130,8 @@ for (option of document.querySelectorAll(".objectButton")) {
         e.target.style.backgroundColor = "#ccc";
         currentTile = e.target.id;
         moveOnTouch = false;
+        document.getElementById("tileName").textContent = e.target.alt;
+        document.getElementById("tileName").animate([{ opacity: 1 }, { opacity: 0 },], 1000,)
     });
 }
 
@@ -132,6 +146,10 @@ document.getElementById("fly").addEventListener("input", (e) => {
     } else {
         fly = false;
     }
+});
+
+document.getElementById("testGame").addEventListener("click", () => {
+    mode = -2;
 });
 
 document.getElementById("save").addEventListener("click", () => {
@@ -291,12 +309,39 @@ function placeTile() {
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
     document.getElementById("fly").checked = "";
+    if (mode == 0) {
+        document.getElementById("ingameMenu").style.display = "";
+        document.getElementById("quit").style.display = "";
+        document.getElementById("edit").style.display = "none";
+    } else if (mode == 1) {
+        document.getElementById("ingameMenu").style.display = "none";
+        level = Object.assign({}, originalLevel);
+    } else if (mode == 2) {
+        document.getElementById("ingameMenu").style.display = "";
+        document.getElementById("quit").style.display = "none";
+        document.getElementById("edit").style.display = "";
+    } else {
+        document.getElementById("ingameMenu").style.display = "none";
+    }
     moveOnTouch = false;
     level = JSON.parse(JSON.stringify(originalLevel));
     x = 0.5;
     y = 0;
     checkpointX = 0.5;
     checkpointY = 0;
+    coins = 0;
+    totalCoins = 0;
+    for (let coin of level.objects) {
+        if (coin.type == "coin") {
+            totalCoins++;
+        }
+    }
+    if (totalCoins > 0) {
+        document.getElementById("coinDisplay").style.display = "";
+        document.getElementById("coinCount").textContent = "0/" + totalCoins;
+    } else {
+        document.getElementById("coinDisplay").style.display = "none";
+    }
     fly = false;
     gameLoop();
 }
@@ -419,6 +464,7 @@ function gameLoop() {
 
         }
         x += xVelocity;
+        let i = 0;
         for (wall of level.objects) {
             if (wall.type == "springup") {
                 if (
@@ -519,7 +565,21 @@ function gameLoop() {
                     checkpointX = wall.x + 0.5;
                     checkpointY = wall.y;
                 }
+            } else if (wall.type == "coin") {
+                if (mode != 1) {
+                    if (
+                        x < wall.x + 5 &&
+                        x + 4 > wall.x &&
+                        y < wall.y + 5 &&
+                        y + 4 > wall.y
+                    ) {
+                        coins++;
+                        document.getElementById("coinCount").textContent = coins + "/" + totalCoins;
+                        level.objects.splice(i, 1);
+                    }
+                }
             }
+            i++;
         }
     } else {
         if (leftDown) {
@@ -563,8 +623,18 @@ function gameLoop() {
 
 
     timePassed = (timePassed + 0.25) % 8;
-    if (mode != -1) {
-        timer = setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
+    if (mode >= 0) {
+        setTimeout(gameLoop, Math.max(100 / 6 - (performance.now() - startTime), 0));
+    } else if (mode == -2) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        mode = 2;
+        document.getElementById("editorMenu").style.display = "none";
+        startGame();
+    } else if (mode == -3) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        mode = 1;
+        document.getElementById("editorMenu").style.display = "";
+        startGame();
     } else {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -573,6 +643,7 @@ function gameLoop() {
 function gameOver() {
     if (checkpointX == 0.5 && checkpointY == 0) {
         level = Object.assign({}, originalLevel);
+        coins = 0;
     }
     x = checkpointX;
     y = checkpointY;

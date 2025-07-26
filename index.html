@@ -34,7 +34,8 @@
             }
 
             #mainMenu,
-            #editorMenu {
+            #editorMenu,
+            #ingameMenu {
                 height: 100vh;
                 left: calc((100vw - (100vh * 4 / 3)) / 2);
             }
@@ -46,14 +47,16 @@
             }
 
             #mainMenu,
-            #editorMenu {
+            #editorMenu,
+            #ingameMenu {
                 width: 100vw;
                 top: calc((100vh - (100vw * 3 / 4)) / 2);
             }
         }
 
         #mainMenu,
-        #editorMenu {
+        #editorMenu,
+        #ingameMenu {
             aspect-ratio: 4/3;
             position: fixed;
         }
@@ -61,6 +64,13 @@
         #mainMenu button {
             padding: 1%;
             margin-bottom: 1%;
+        }
+
+        #ingameMenu button {
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            padding: 1%;
         }
 
         #editorMenu {
@@ -124,6 +134,27 @@
         #move {
             width: 5%;
         }
+
+        #tileName {
+            position: absolute;
+            bottom: 15%;
+            width: 100%;
+            opacity: 0;
+        }
+
+        #coinDisplay {
+            display: flex;
+            align-items: center;
+            float: right;
+            margin-right: 1%;
+            margin-top: 1%;
+            font-size: 150%;
+        }
+
+        #coinIcon {
+            width: 1.5em;
+            margin-right: 0.4em;
+        }
     </style>
 </head>
 
@@ -147,23 +178,32 @@
                 <input id="fly" type="checkbox">
             </div>
         </div>
+        <p id="tileName"></p>
         <div id="objectSelector">
-            <img id="dirt" class="objectButton" src="assets/dirt.webp">
-            <img id="grass" class="objectButton" src="assets/grass.webp">
-            <img id="springup" class="objectButton" src="assets/springup.webp">
-            <img id="springdown" class="objectButton" src="assets/springdown.webp">
-            <img id="spike" class="objectButton" src="assets/spike.webp">
-            <img id="lava" class="objectButton" src="assets/lava.webp">
-            <img id="enemy" class="objectButton" src="assets/enemy.webp">
-            <img id="coin" class="objectButton" src="assets/coin.webp">
-            <img id="redflag" class="objectButton" src="assets/redflag.webp">
+            <img id="dirt" class="objectButton" alt="Dirt" src="assets/dirt.webp">
+            <img id="grass" class="objectButton" alt="Grass" src="assets/grass.webp">
+            <img id="springup" class="objectButton" alt="Up Spring" src="assets/springup.webp">
+            <img id="springdown" class="objectButton" alt="Down Spring" src="assets/springdown.webp">
+            <img id="spike" class="objectButton" alt="Spike" src="assets/spike.webp">
+            <img id="lava" class="objectButton" alt="Lava" src="assets/lava.webp">
+            <img id="enemy" class="objectButton" alt="Enemy" src="assets/enemy.webp">
+            <img id="coin" class="objectButton" alt="Coin" src="assets/coin.webp">
+            <img id="redflag" class="objectButton" alt="Checkpoint" src="assets/redflag.webp">
             <img id="greenflag" class="objectButton" style="display: none;" src="assets/greenflag.webp">
-            <img id="end" class="objectButton" src="assets/end.webp">
-            <img id="eraser" class="objectButton" src="assets/eraser.webp">
-            <img id="move" style="display: none;" src="assets/move.webp">
+            <img id="end" class="objectButton" alt="End Flag" src="assets/end.webp">
+            <img id="eraser" class="objectButton" alt="Eraser" src="assets/eraser.webp">
+            <img id="move" style="display: none;" alt="Move Your Player In Editor" src="assets/move.webp">
+        </div>
+
+    </div>
+    <div id="ingameMenu" style="display: none;">
+        <button id="quit" style="display: none;">Quit</button>
+        <button id="edit" style="display: none;">Back To Editor</button>
+        <div id="coinDisplay">
+            <img id="coinIcon" alt="Coin Icon" src="assets/coin.webp">
+            <span id="coinCount"></span>
         </div>
     </div>
-
 
     <script src="script.js"></script>
 
