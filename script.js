@@ -351,7 +351,6 @@ function gameLoop() {
 
     if (mousedown && ((touchScreen && mode != 1) || moveOnTouch)) {
         let angle = Math.atan(((mouseX - width / 2) / 5) / ((height / 2 - mouseY) / 5));
-        console.log(angle)
         if (((height / 2 - mouseY) / 5) > 0) {
             downDown = false;
             if (angle > -1.1 && angle < 1.1) {
