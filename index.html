@@ -9,15 +9,29 @@
             background-color: black;
             margin: 0;
             text-align: center;
+        }
+
+        * {
             font-family: "Press Start 2P", sans-serif;
         }
 
+        button {
+            appearance: none;
+        }
+
+        h1 {
+            margin-bottom: 4%;
+        }
+
         #canvas {
-            background-color: white;
+            background-color: skyblue;
             position: fixed;
         }
 
         @media (aspect-ratio > 4/3) {
+            #editOptions * {
+                font-size: 1.5vh;
+            }
 
             #mainMenu,
             #editorMenu {
@@ -27,6 +41,9 @@
         }
 
         @media (aspect-ratio <=4/3) {
+            #editOptions * {
+                font-size: 1.5vw;
+            }
 
             #mainMenu,
             #editorMenu {
@@ -41,6 +58,11 @@
             position: fixed;
         }
 
+        #mainMenu button {
+            padding: 1%;
+            margin-bottom: 1%;
+        }
+
         #editorMenu {
             pointer-events: none;
         }
@@ -48,7 +70,7 @@
         #objectSelector {
             width: 75%;
             height: 10%;
-            background-color: #eee;
+            background-color: white;
             left: 12.5%;
             position: absolute;
             bottom: 1%;
@@ -62,23 +84,27 @@
         #editOptions {
             width: 90%;
             height: 5%;
-            background-color: #eee;
+            background-color: white;
             left: 5%;
             position: absolute;
             top: 1%;
-            border-radius: 1% / 24%;
+            border-radius: 1% / 18%;
             pointer-events: auto;
             display: flex;
             align-items: center;
-            padding-inline: 1%;
+            padding: 1.25% 1%;
         }
 
         #editOptions * {
             margin-left: 1%;
         }
 
+        #editOptions button {
+            height: 100%;
+        }
+
         #flyBox {
-            margin-inline: auto 1%;
+            margin-inline: auto 0;
         }
 
         #flyBox * {
@@ -94,15 +120,19 @@
             object-fit: cover;
             aspect-ratio: 1;
         }
+
+        #move {
+            width: 5%;
+        }
     </style>
 </head>
 
-<body>
+<body onclick="">
     <canvas id="canvas"></canvas>
     <div id="mainMenu">
-        <h1>Scrolling Platformer</h1>
-        <button id="play">Play</button>
-        <button id="newGame">Make a New Level</button>
+        <h1>Scrolling Platformer Creator</h1>
+        <button id="play">Play</button> <br>
+        <button id="newGame">Make a New Level</button> <br>
         <button id="load">Load a Level</button>
     </div>
     <div id="editorMenu" style="display: none;">
@@ -125,9 +155,12 @@
             <img id="spike" class="objectButton" src="assets/spike.webp">
             <img id="lava" class="objectButton" src="assets/lava.webp">
             <img id="enemy" class="objectButton" src="assets/enemy.webp">
+            <img id="coin" class="objectButton" src="assets/coin.webp">
             <img id="redflag" class="objectButton" src="assets/redflag.webp">
             <img id="greenflag" class="objectButton" style="display: none;" src="assets/greenflag.webp">
+            <img id="end" class="objectButton" src="assets/end.webp">
             <img id="eraser" class="objectButton" src="assets/eraser.webp">
+            <img id="move" style="display: none;" src="assets/move.webp">
         </div>
     </div>
 

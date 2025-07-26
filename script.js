@@ -28,6 +28,8 @@ var currentTile = "dirt";
 var tileX;
 var tileY;
 var mousedown = false;
+var moveOnTouch;
+var touchScreen = false;
 var timePassed = 0;
 
 
@@ -71,6 +73,12 @@ document.getElementById("leaveEditor").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (e) => {
+    document.getElementById("move").style.display = "none";
+    touchScreen = false;
+    moveOnTouch = false;
+    document.getElementById("move").style.backgroundColor = "";
+    document.getElementById("move").style.boxShadow = "";
+    document.getElementById(currentTile).style.boxShadow = "0 0 5px 5px #ccc";
     if (e.key == "ArrowLeft" || e.key == "a") {
         leftDown = true;
     } else if (e.key == "ArrowRight" || e.key == "d") {
@@ -104,9 +112,12 @@ for (option of document.querySelectorAll(".objectButton")) {
             otherOption.style.boxShadow = "";
             otherOption.style.backgroundColor = "";
         }
+        document.getElementById("move").style.boxShadow = "";
+        document.getElementById("move").style.backgroundColor = "";
         e.target.style.boxShadow = "0 0 5px 5px #ccc";
         e.target.style.backgroundColor = "#ccc";
         currentTile = e.target.id;
+        moveOnTouch = false;
     });
 }
 
@@ -163,9 +174,28 @@ async function load() {
     }
 }
 
-canvas.addEventListener("mousedown", () => {
+document.addEventListener("contextmenu", (e) => { e.preventDefault(); });
+
+document.getElementById("move").addEventListener("click", (e) => {
+    for (otherOption of document.querySelectorAll(".objectButton")) {
+        otherOption.style.boxShadow = "";
+        otherOption.style.backgroundColor = "";
+    }
+    e.target.style.boxShadow = "0 0 5px 5px #ccc";
+    e.target.style.backgroundColor = "#ccc";
+    moveOnTouch = true;
+});
+
+canvas.addEventListener("mousedown", (e) => {
     mousedown = true;
-    placeTile();
+    if (e.button == 2) {
+        let tempTile = currentTile;
+        currentTile = "eraser";
+        placeTile();
+        currentTile = tempTile;
+    } else {
+        placeTile();
+    }
 });
 
 canvas.addEventListener("mouseup", () => {
@@ -175,11 +205,25 @@ canvas.addEventListener("mouseup", () => {
 canvas.addEventListener("mousemove", (e) => {
     mouseX = e.offsetX;
     mouseY = e.offsetY;
-    placeTile();
+    if (e.buttons == 2) {
+        let tempTile = currentTile;
+        currentTile = "eraser";
+        placeTile();
+        currentTile = tempTile;
+    } else {
+        placeTile();
+    }
+});
+
+addEventListener("touchstart", (e) => {
+    document.getElementById("move").style.display = "";
+    touchScreen = true;
 });
 
 canvas.addEventListener("touchstart", (e) => {
+    document.getElementById("move").style.display = "";
     mousedown = true;
+    touchScreen = true;
     if (window.innerWidth / 4 > window.innerHeight / 3) {
         mouseX = e.targetTouches[0].clientX - (window.innerWidth - window.innerHeight * 4 / 3) / 2;
         mouseY = e.targetTouches[0].clientY;
@@ -208,7 +252,7 @@ canvas.addEventListener("touchend", () => {
 });
 
 function placeTile() {
-    if (mode == 1 && mousedown) {
+    if (mode == 1 && mousedown && !moveOnTouch) {
         if (
             tileX != (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5 ||
             tileY != (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5
@@ -247,6 +291,7 @@ function placeTile() {
 function startGame() {
     document.getElementById("mainMenu").style.display = "none";
     document.getElementById("fly").checked = "";
+    moveOnTouch = false;
     level = JSON.parse(JSON.stringify(originalLevel));
     x = 0.5;
     y = 0;
@@ -258,6 +303,51 @@ function startGame() {
 
 function gameLoop() {
     startTime = performance.now();
+
+    if (mousedown && ((touchScreen && mode != 1) || moveOnTouch)) {
+        let angle = Math.atan(((mouseX - width / 2) / 5) / ((height / 2 - mouseY) / 5));
+        console.log(angle)
+        if (((height / 2 - mouseY) / 5) > 0) {
+            downDown = false;
+            if (angle > -1.1 && angle < 1.1) {
+                upDown = true;
+            } else {
+                upDown = false;
+            }
+            if ((angle < -0.6 && angle > -1.6)) {
+                leftDown = true;
+            } else {
+                leftDown = false;
+            }
+            if ((angle < 1.6 && angle > 0.6)) {
+                rightDown = true;
+            } else {
+                rightDown = false;
+            }
+        } else {
+            upDown = false;
+            if (angle > -1.1 && angle < 1.1) {
+                downDown = true;
+            } else {
+                downDown = false;
+            }
+            if ((angle < 1.6 && angle > 0.6)) {
+                leftDown = true;
+            } else {
+                leftDown = false;
+            }
+            if ((angle < -0.6 && angle > -1.6)) {
+                rightDown = true;
+            } else {
+                rightDown = false;
+            }
+        }
+    } else if (!mousedown && (touchScreen || moveOnTouch)) {
+        leftDown = false;
+        rightDown = false;
+        upDown = false;
+        downDown = false;
+    }
 
     if (!fly) {
         if (xVelocity < 0.75 && rightDown) {
@@ -461,7 +551,7 @@ function gameLoop() {
             ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
         }
     }
-    if (mode == 1) {
+    if (mode == 1 && !moveOnTouch) {
         ctx.globalAlpha = 0.5;
         if (currentTile == "lava") {
             ctx.drawImage(document.getElementById(currentTile), Math.floor(timePassed) * 512, 0, 512, 512, Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
