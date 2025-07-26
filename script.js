@@ -10,6 +10,8 @@ var originalLevel = {
 };
 var x;
 var y;
+var checkpointX = 0.5;
+var checkpointY = 0;
 var xVelocity = 0;
 var yVelocity = 0;
 var leftDown = false;
@@ -96,11 +98,6 @@ document.addEventListener("keyup", (e) => {
     }
 });
 
-canvas.addEventListener("mousemove", (e) => {
-    mouseX = e.offsetX;
-    mouseY = e.offsetY;
-});
-
 for (option of document.querySelectorAll(".objectButton")) {
     option.addEventListener("click", (e) => {
         for (otherOption of document.querySelectorAll(".objectButton")) {
@@ -166,16 +163,49 @@ async function load() {
     }
 }
 
-document.getElementById("canvas").addEventListener("mousedown", () => {
+canvas.addEventListener("mousedown", () => {
     mousedown = true;
     placeTile();
 });
 
-document.getElementById("canvas").addEventListener("mouseup", () => {
+canvas.addEventListener("mouseup", () => {
     mousedown = false;
 });
 
-document.getElementById("canvas").addEventListener("mousemove", placeTile);
+canvas.addEventListener("mousemove", (e) => {
+    mouseX = e.offsetX;
+    mouseY = e.offsetY;
+    placeTile();
+});
+
+canvas.addEventListener("touchstart", (e) => {
+    mousedown = true;
+    if (window.innerWidth / 4 > window.innerHeight / 3) {
+        mouseX = e.targetTouches[0].clientX - (window.innerWidth - window.innerHeight * 4 / 3) / 2;
+        mouseY = e.targetTouches[0].clientY;
+    } else {
+        mouseX = e.targetTouches[0].clientX;
+        mouseY = e.targetTouches[0].clientY - (window.innerHeight - window.innerWidth / 4 * 3) / 2;
+    }
+    placeTile();
+    e.preventDefault();
+});
+
+canvas.addEventListener("touchmove", (e) => {
+    if (window.innerWidth / 4 > window.innerHeight / 3) {
+        mouseX = e.targetTouches[0].clientX - (window.innerWidth - window.innerHeight * 4 / 3) / 2;
+        mouseY = e.targetTouches[0].clientY;
+    } else {
+        mouseX = e.targetTouches[0].clientX;
+        mouseY = e.targetTouches[0].clientY - (window.innerHeight - window.innerWidth / 4 * 3) / 2;
+    }
+    placeTile();
+    e.preventDefault();
+});
+
+canvas.addEventListener("touchend", () => {
+    mousedown = false;
+});
 
 function placeTile() {
     if (mode == 1 && mousedown) {
@@ -220,6 +250,8 @@ function startGame() {
     level = JSON.parse(JSON.stringify(originalLevel));
     x = 0.5;
     y = 0;
+    checkpointX = 0.5;
+    checkpointY = 0;
     fly = false;
     gameLoop();
 }
@@ -337,9 +369,7 @@ function gameLoop() {
                     ]
                 };
                 if (detectCollision(square, triangle)) {
-                    x = 0.5;
-                    y = 0;
-                    level = Object.assign({}, originalLevel);
+                    gameOver();
                 }
             } else if (wall.type == "lava") {
                 if (
@@ -348,9 +378,7 @@ function gameLoop() {
                     y < wall.y + 4.375 &&
                     y + 4 > wall.y
                 ) {
-                    x = 0.5;
-                    y = 0;
-                    level = JSON.parse(JSON.stringify(originalLevel));
+                    gameOver();
                 }
             } else if (wall.type == "enemy") {
                 if (mode != 1) {
@@ -382,9 +410,24 @@ function gameLoop() {
                     y < wall.y + 5 &&
                     y + 4 > wall.y
                 ) {
-                    x = 0.5;
-                    y = 0;
-                    level = JSON.parse(JSON.stringify(originalLevel));
+                    gameOver();
+                }
+            } else if (wall.type == "redflag" && mode != 1) {
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y < wall.y + 5 &&
+                    y + 4 > wall.y
+                ) {
+                    for (flag of level.objects) {
+                        if (flag.type == "greenflag") {
+                            flag.type = "redflag";
+                            break;
+                        }
+                    }
+                    wall.type = "greenflag";
+                    checkpointX = wall.x + 0.5;
+                    checkpointY = wall.y;
                 }
             }
         }
@@ -404,9 +447,7 @@ function gameLoop() {
     }
 
     if (y < -125) {
-        x = 0.5;
-        y = 0;
-        level = JSON.parse(JSON.stringify(originalLevel));
+        gameOver();
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -427,7 +468,7 @@ function gameLoop() {
         } else {
             ctx.drawImage(document.getElementById(currentTile), Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) * height / 20 - ((x % 5 - (4.155)) * (height / 100)), Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) * height / 20 + ((y % 5 + 2.5) * (height / 100)), height / 20, height / 20);
         }
-        
+
     }
 
 
@@ -439,6 +480,13 @@ function gameLoop() {
     }
 }
 
+function gameOver() {
+    if (checkpointX == 0.5 && checkpointY == 0) {
+        level = Object.assign({}, originalLevel);
+    }
+    x = checkpointX;
+    y = checkpointY;
+}
 
 // All of the following code is AI-generated.
 
