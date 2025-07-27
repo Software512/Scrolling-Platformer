@@ -36,7 +36,8 @@
 
             #mainMenu,
             #editorMenu,
-            #ingameMenu {
+            #ingameMenu,
+            #winScreen {
                 height: 100vh;
                 left: calc((100vw - (100vh * 4 / 3)) / 2);
             }
@@ -49,7 +50,8 @@
 
             #mainMenu,
             #editorMenu,
-            #ingameMenu {
+            #ingameMenu,
+            #winScreen {
                 width: 100vw;
                 top: calc((100vh - (100vw * 3 / 4)) / 2);
             }
@@ -57,12 +59,14 @@
 
         #mainMenu,
         #editorMenu,
-        #ingameMenu {
+        #ingameMenu,
+        #winScreen {
             aspect-ratio: 4/3;
             position: fixed;
         }
 
-        #mainMenu button {
+        #mainMenu button,
+        #winScreen button {
             padding: 1%;
             margin-bottom: 1%;
         }
@@ -72,9 +76,11 @@
             top: 1%;
             left: 1%;
             padding: 1%;
+            pointer-events: auto;
         }
 
-        #editorMenu, #ingameMenu {
+        #editorMenu,
+        #ingameMenu {
             pointer-events: none;
         }
 
@@ -204,6 +210,14 @@
             <img id="coinIcon" alt="Coin Icon" src="assets/coin.webp">
             <span id="coinCount"></span>
         </div>
+    </div>
+    <div id="winScreen" style="display: none;">
+        <h1>You win!</h1>
+        <p id="time"></p>
+        <p id="finalCoins"></p>
+        <button id="leaveWinScreen">Main Menu</button>
+        <button id="leaveWinScreenToEditor">Back to Editor</button>
+        <button id="replay">Replay</button>
     </div>
 
     <script src="script.js"></script>

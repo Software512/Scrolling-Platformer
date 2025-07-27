@@ -33,6 +33,18 @@ var touchScreen = false;
 var timePassed = 0;
 var coins;
 var totalCoins;
+var timePlayed;
+
+/* Modes:
+-1: not playing.
+-2: temporary, go to testing mode.
+-3: temporary, go back to editor.
+-4: open win screen.
+-5: open win screen for testing mode.
+0: normal.
+1: edit.
+2: testing.
+*/
 
 
 resize();
@@ -82,6 +94,33 @@ document.getElementById("quit").addEventListener("click", () => {
     mode = -1;
     document.getElementById("ingameMenu").style.display = "none";
     document.getElementById("mainMenu").style.display = "";
+});
+
+document.getElementById("leaveWinScreen").addEventListener("click", () => {
+    mode = -1;
+    document.getElementById("winScreen").style.display = "none";
+    document.getElementById("mainMenu").style.display = "";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+document.getElementById("leaveWinScreenToEditor").addEventListener("click", () => {
+    mode = -3;
+    document.getElementById("winScreen").style.display = "none";
+    document.getElementById("editorMenu").style.display = "";
+    level = JSON.parse(JSON.stringify(originalLevel));
+    startGame();
+});
+
+document.getElementById("replay").addEventListener("click", () => {
+    document.getElementById("winScreen").style.display = "none";
+    document.getElementById("ingameMenu").style.display = "";
+    level = JSON.parse(JSON.stringify(originalLevel));
+    if (mode == -5) {
+        mode = 2;
+    } else {
+        mode = 0;
+    }
+    startGame();
 });
 
 document.addEventListener("keydown", (e) => {
@@ -149,8 +188,12 @@ document.getElementById("fly").addEventListener("input", (e) => {
 });
 
 document.getElementById("testGame").addEventListener("click", () => {
+    x = 0.5;
+    y = 0;
     mode = -2;
 });
+
+
 
 document.getElementById("save").addEventListener("click", () => {
     let compressedData;
@@ -292,12 +335,39 @@ function placeTile() {
                         object.x == tileX &&
                         object.y == tileY
                     ) {
-                        if (!(object.x == 0 && object.y == -5 && currentTile == "eraser")) originalLevel.objects.splice(i, 1);
+                        if (
+                            !(object.x == 0 && object.y == -5 &&
+                                (
+                                    currentTile == "redflag" ||
+                                    currentTile == "end" ||
+                                    currentTile == "coin" ||
+                                    currentTile == "eraser" ||
+                                    currentTile == "spike" ||
+                                    currentTile == "lava" ||
+                                    currentTile == "enemy"
+                                ))
+                        ) {
+                            originalLevel.objects.splice(i, 1);
+                        }
                         break;
                     }
                     i++;
                 }
-                if (currentTile != "eraser") {
+                if (
+                    currentTile != "eraser" &&
+                    !(
+                        tileX == 0 &&
+                        tileY == -5 &&
+                        (
+                            currentTile == "redflag" ||
+                            currentTile == "end" ||
+                            currentTile == "coin" ||
+                            currentTile == "spike" ||
+                            currentTile == "lava" ||
+                            currentTile == "enemy"
+                        )
+                    )
+                ) {
                     originalLevel.objects.push({ x: tileX, y: tileY, type: currentTile });
                 }
                 level = JSON.parse(JSON.stringify(originalLevel));
@@ -329,6 +399,8 @@ function startGame() {
     y = 0;
     checkpointX = 0.5;
     checkpointY = 0;
+    xVelocity = 0;
+    yVelocity = 0;
     coins = 0;
     totalCoins = 0;
     for (let coin of level.objects) {
@@ -343,6 +415,7 @@ function startGame() {
         document.getElementById("coinDisplay").style.display = "none";
     }
     fly = false;
+    timePlayed = performance.now();
     gameLoop();
 }
 
@@ -577,6 +650,21 @@ function gameLoop() {
                         level.objects.splice(i, 1);
                     }
                 }
+            } else if (wall.type == "end") {
+                if (mode != 1) {
+                    if (
+                        x < wall.x + 5 &&
+                        x + 4 > wall.x &&
+                        y < wall.y + 5 &&
+                        y + 4 > wall.y
+                    ) {
+                        if (mode == 2) {
+                            mode = -5;
+                        } else {
+                            mode = -4;
+                        }
+                    }
+                }
             }
             i++;
         }
@@ -634,6 +722,30 @@ function gameLoop() {
         mode = 1;
         document.getElementById("editorMenu").style.display = "";
         startGame();
+    } else if (mode == -4) {
+        let finalTime = performance.now() - timePlayed;
+        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000);
+        document.getElementById("leaveWinScreenToEditor").style.display = "none";
+        document.getElementById("leaveWinScreen").style.display = "";
+        if (totalCoins) {
+            document.getElementById("finalCoins").textContent = "Coins: " + coins + "/" + totalCoins;
+        } else {
+            document.getElementById("finalCoins").textContent = "";
+        }
+        document.getElementById("ingameMenu").style.display = "none";
+        document.getElementById("winScreen").style.display = "";
+    } else if (mode == -5) {
+        let finalTime = performance.now() - timePlayed;
+        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000);
+        document.getElementById("leaveWinScreenToEditor").style.display = "";
+        document.getElementById("leaveWinScreen").style.display = "none";
+        if (totalCoins) {
+            document.getElementById("finalCoins").textContent = "Coins: " + coins + "/" + totalCoins;
+        } else {
+            document.getElementById("finalCoins").textContent = "";
+        }
+        document.getElementById("ingameMenu").style.display = "none";
+        document.getElementById("winScreen").style.display = "";
     } else {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -643,6 +755,8 @@ function gameOver() {
     if (checkpointX == 0.5 && checkpointY == 0) {
         level = Object.assign({}, originalLevel);
         coins = 0;
+        document.getElementById("coinCount").textContent = "0/" + totalCoins;
+        timePlayed = performance.now();
     }
     x = checkpointX;
     y = checkpointY;
