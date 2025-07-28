@@ -30,6 +30,10 @@
             margin-top: 5%;
         }
 
+        #winHeader {
+            font-size: 2.5em;
+        }
+
         #canvas {
             background-color: skyblue;
             position: fixed;
@@ -206,6 +210,10 @@
         #levelOptions button {
             margin-top: 5%;
         }
+
+        #parInput {
+            margin-bottom: 4%;
+        }
     </style>
 </head>
 
@@ -213,7 +221,7 @@
     <canvas id="canvas"></canvas>
     <div id="mainMenu">
         <h1>Scrolling Platformer Creator</h1>
-        <button id="play">Play</button> <br>
+        <button id="chooseLevel">Play a Default Level</button> <br>
         <button id="newGame">Make a New Level</button> <br>
         <button id="load">Load a Level</button> <br>
         <button id="openCredits">Credits</button>
@@ -261,8 +269,11 @@
     </div>
     <div id="levelOptionsOverlay" style="display: none;"></div>
     <div id="levelOptions" style="display: none;">
-        <label id="parLabel" for="parInput">Par &lpar;Accepts any text&rpar;</label>
-        <input id="parInput" min="1">
+        <label id="parLabel" for="parInput">Par Time</label>
+        <input id="parInput" min="1"> <br>
+        <label id="showDeathsLabel" for="showDeaths">Show deaths on win screen:</label>
+        <input id="showDeaths" type="checkbox" min="1"> <br>
+        <button id="resetLevel">Reset Level</button> <br>
         <button id="closeLevelOptions">Close</button>
     </div>
     <div id="ingameMenu" style="display: none;">
@@ -274,9 +285,10 @@
         </div>
     </div>
     <div id="winScreen" style="display: none;">
-        <h1>You win!</h1>
+        <h1 id="winHeader">You win!</h1>
         <p id="time"></p>
         <p id="finalCoins"></p>
+        <p id="deathCount"></p>
         <button id="leaveWinScreen">Main Menu</button>
         <button id="leaveWinScreenToEditor">Back to Editor</button> <br>
         <button id="replay">Replay</button>

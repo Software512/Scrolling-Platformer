@@ -1,2 +1,2 @@
 # Scrolling Platformer
-A work in progress.
+Create your own platformer-style game levels.

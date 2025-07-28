@@ -1,13 +1,8 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-var level;
-var originalLevel = {
-    objects: [
-        { x: 0, y: -5, type: "dirt" },
-        { x: -20, y: 5, type: "dirt" }
-    ]
-};
+var level = { objects: [{ x: 0, y: -5, type: "dirt" }] };;
+var originalLevel = { objects: [{ x: 0, y: -5, type: "dirt" }] };
 var x;
 var y;
 var checkpointX = 0.5;
@@ -34,6 +29,7 @@ var timePassed = 0;
 var coins;
 var totalCoins;
 var timePlayed;
+var deaths;
 
 /* Modes:
 -1: not playing.
@@ -67,9 +63,9 @@ function resize() {
     canvas.height = height;
 }
 
-document.getElementById("play").addEventListener("click", () => {
+document.getElementById("chooseLevel").addEventListener("click", () => {
     mode = 0;
-    startGame();
+    load("1f8b080000000000000a959dcb8e24370e45ff25d71540e8158f5afb2f0c2f6adc3976cfd8dd8deaf2d80dc3ff6ec095526688ba3c31eb4b5e491445510c29f3cfcbe77ffde7fae3dbd7cbf3f77f5efeb83ccf4f976f97e7a93c5ddebe7db95e9e2f1f3ebebe5dfe7afa079ce23b3c466faa61765157378e758b8b065f39f8dad1d78e7ebfa33fe8e89ab3f4e02f2fff7be94715045ccec1b30bfb4d43c7c6d4934b3df9fd9afc514d609409ac32815926df2e936f98892c73f386b1ab4cbeaf4ce0691338ea04cb608255349d5a45027d0745cf6e0dc73bfaf5cbebc74f3f7df8fcfba72341f496519a1dfd5bf7d42a2d1e7a1bb9687cb2dd1f995dc1f194f6c3d8ae9faebf7eeb8675477ffcfcb11f73f1c020d0e2a1d30d8ee37627d3e7a1b2187132f0fb6cfef6c58888e94aae2b3658b49fdfc9b30f17415ee1c7de7ffceff56e1a639ba3a7f9b629fec08b3ff0ec6b675fbb0c56e9e3c8f260de0e38e8dff8b5e566d7f037584d5bf1a76df1c9571f5e4e91abae55d8d74ebe3638946a7b837183b39bae1d167a306d1fe38031cb01bef9d3a262ccecc28bf1a6a376e96dfe089bbde211f4130c482fb64178e8b7aa2a94cf08156fd39bf69b91c4ecefc68623b8f8daca3976dfeb77dfeb77dfeb57df776ec65914ecef00ab1f84575f7bf1b5175f7bf3b5775f7b07ede21a35ccbed1c30cfa01f008fc11f413e827d0b7f1aa4bc508f7f963007d187fc355820fb962f473f086ab0342f493e486833a68cbe30d9e6fe880d304c800135970a22998680e2715d8ee02c4a002eb5d000e8ad20c64053202d9804c401638393eb56f359cf8c9c0b2016ca10aacc4b012c3460c1b31ec8aa11604b40031ccc4300343d88121ecc4b011c3460c2b31acc4b010c3420c85180a316462c8c490882111432406f2c9403e19c82703f964209f2497248f2487247f245f2177256f25672557244f2447243f2437242f2427c4b848819522338576d81b9a833e101ccfd50904162240811d04dadef1602453a66b42eb19a1e58c9039388f84ccc1792494ce087945c838f8d4e0749c654e889c69ca1d58adb9405241b9a9cc9cea5020a390f8eceb077b823d7e7fb1658323bef9fab19f8951e0f151757aa9b03a9b2e30b20d4666cb84477c85b3f30aed17c2a1fd0cfac954e48ee5df605df728b00f083af7bf79870abc37e720d8afdca85da1c2be36653572cf08fed06a5e25f108fa11f413e827d0cf27dbbf9beff01dacf9972428d04001fd05f417d05fc94026321e77e4682263574c07fdddd7afab47ecf7e7b455b57df74bf915f6b557a53df70beb38f0ea593299329ed57dc4201cf8b3af5f274e560a60e54758f911567684c8d0fa0745539d0dfbdf201a0efaba18647c6fb8f054fb0d87854bfc326509e03f01fc67f1f1e61f32533fa7af565fc355e009c6be631cf455ec682925e0ba7de87f84f623f43fc2f86de0b66939ec7e1136b7089b5784cd2b263386635a9c8c0d867891fad03fc81e2aae8f25fe57eedabe8c41c9f8c810277e79ac497e8c8a760f39663711b28b08d9457590870ebc5e3ffcfb97979fac08f810e26a8c0bc47948d02a2ee7d05e0818e234077a7ce023b08fc415f437d0df60fc1bd80f4e37110e47d1a661ddf996f48d8f1fcf6fad0125906c26d20b1083dd0b05831a24245b0992a9649381231e4d073b9cf4fd636484643852b24ac9c802fa2b6cd6ab9feb571f51c97e75118d83fecdfebb68bfce9fc64d323cd4471cfaa771d287f623f4bffa17f8afc403e82763ff21aeaa28c99ea20f8948b2c95887fb9b404a7e15a7e1a02fd72f244a09129904894c82442441229320114a90a82548d412d49f13d49713d49793ad9274386cd2b69231e4477d5943f6e363b287e92e3e9ec4557cddccf8c638f0cb246a8344dedeeb1b26510ff8f1a051f92109d3b8af1fe08657c3415fdef6af38e8cbaf0815077da8c548fadd7c861a567911872ab154777b1ffcaf37b5c42d4de76bdbcbf3ddf709fbfda7abf398b177055ed0b76f54861f85d5ab8b76b912da97b87d8932c4a3080dc17ec21ca69672e9c335f98acb4b6d7051bee152df8c6f183a340efa7029b98656b935ceb0b586735b2bf1abd429da4f04435cf3c3fcdb9bd1b68e662f950f2ec5477bbf7ed853797d723741dabe509afd409e20d0576b230eb3a5bcbdceb6e487abc435919338bdc1b25799bb8ad7ea87a336092a9c6c7eb86a13042745f5b625d99dfc88db57661d0e0684d758091e7325780bd670673925786ed670e584f0d82dd93b05435c85fc8683beccf66d55746823f924ad4e92ec203c16ac0d886748777ee544d9ffe8db70a56f6bb6837899ecceda9961015f5bc08f56d05f417f03fd8dda377e7c0c46099edd247877936db019eaab57be5386709fe15c91ec96d5e9033fbc3cc936791ce2f2512dd40532d41532d425aa7dd442cd76a18dc70fe353079f6c93fb210eeaa0ad5ed6349c9a972f6b9a001940be29c9f8acdaff3c93e1f34cc5895fed35d986e221ae2a3b8d1f70fdea1c3cac808715f0b0e27b58f13dac808715f2b0421e56c8c30a795815a02990ef969a135318d30cf5ee7b527b658d648e443ccba17e7ea1e2eaa89da15451a3e9a4f28e26a0128f1a4f354315900cf488ac99490a2462c8c450b00f7514b0af6981440c89183231646228c450886121860519ac478d0564805f683617bbae840031c810d404884186c1262019ecc23107b726e4bd84b80b9d61f25e15dc85ce307927cebbd01926ef35c45dc8635a69db5a693a3662d8886127867a4af51d021c4ac1abafbdfada9bafbdf9dafba9b627b90d56cb6901b07d99c1f655408ee09479c41657282d2f91fa9f8821114326868c36746d50fc2f4ec5ffea52fc7351359082fdef45c5ffda544d23615f7bb6763bfece1dfe8a1efd54dddd7bb10f30398e0031d0c9b136a1d640326bb8c34d1038e27e78abb0f2ddc5b08f71e9fcb49f17ca080ae514e5ccbe598a6519089d61a224a80c36fba34021063aa8b5988302d26899cc9e61e26a454ca79375ed488199186664b069dc5840ff401725e65540d6359a0031a83b4b79f09c792ca06e4ddd0588413f39af02c4f0cfe36b90a0f281b425fd6c481390b6a4b7e54d40da925eb7370169cb48b68ce76d2993debb04ce983c6cdd2524472189801c0139227244e448c89190a38ef6f0d2fe9030df530eac5f05f788d63a23a7ef2e21eb378526380dba3b2e8e3812c891ec9212153bbde80a2dba428baed0a22bb4e8aa848c1d839f9518db5b0a6462c8c450ce32e871660c3f998c5990a2a0631574ac42c618fc4cc7b85a8402d23317f24cfab598bb0097b4b02a264db560b45830e22c184f160ca10b86e1821c05393272e4ffa31f326ce54128bf7efa6003c2c3d40e3f244cea3dc44354c2b8a5f781c162ec3e26581f3d0a2c83d5dafdd8ec2023197fb108411b7430967147d4038b366d5a80185a1372a883f5386e43ce7b46c7c036124ec9e027868e02f3c0b99484ea46207bb7639eec267dc9aa02abce1f4e1f2df42a09b48ecaa0b6defd26b23d347702c860ab41e326a4c0a0b62f0468145a80186ecb58e3fee7d3626fb90f6b5e12879be0b5ea191ea3f6e36da15ab59304f695c0119f417f36fac3aa3915c5a82646fad4beac0ec1e5dc02b7adaafd340efa709baa4eb0c4e11f0caa03eaea18e8db9ff21f16f0340efa7055bff9079c431e226eff9a7db59b60b746de291e3e6bf614d96e3fbd48fbf552d94c18b074179df1ff41fcc516ed623de0c1de2decf0d9c7ed45ea0e07fd15f4ed45ef23be803ebceb683f5c2671d0cfa09f7dfdf6a3e2303efdb0c8de5eed04763fdc56028d83fe0afa2be84338af33a8ffb708f4e16a5c9d218d037f321e307ef924f0f6eb28bd07fcf074f9faf3e7dfbfbbbebcfdfcf5f2fcf6fadbf5e9f2e5e5f5f27cc9cff37cf9eb6fbfa9fcf59c6d0000");
 });
 
 document.getElementById("newGame").addEventListener("click", () => {
@@ -104,6 +100,14 @@ document.getElementById("quit").addEventListener("click", () => {
     mode = -1;
     document.getElementById("ingameMenu").style.display = "none";
     document.getElementById("mainMenu").style.display = "";
+});
+
+document.getElementById("showDeaths").addEventListener("input", (e) => {
+    if (e.target.checked) {
+        originalLevel.showDeaths = true;
+    } else {
+        originalLevel.showDeaths = false;
+    }
 });
 
 document.getElementById("leaveWinScreen").addEventListener("click", () => {
@@ -208,6 +212,7 @@ document.getElementById("testGame").addEventListener("click", () => {
 
 document.getElementById("levelOptionsButton").addEventListener("click", () => {
     if (level.par) document.getElementById("parInput").value = level.par;
+    if (level.showDeaths) document.getElementById("showDeaths").checked = level.showDeaths == true ? level.showDeaths : "";
     document.getElementById("levelOptions").style.display = "";
     document.getElementById("levelOptionsOverlay").style.display = "";
 });
@@ -234,16 +239,41 @@ document.getElementById("save").addEventListener("click", () => {
     });
 });
 
-document.getElementById("loadToEditor").addEventListener("click", load);
+document.getElementById("loadToEditor").addEventListener("click", () => { load() });
 
 document.getElementById("load").addEventListener("click", () => {
     mode = 0;
     load();
 });
 
-async function load() {
+document.getElementById("resetLevel").addEventListener("click", () => {
+    if (confirm("This will reset any unsaved progress. Do you want to continue?")) {
+        originalLevel = { objects: [{ x: 0, y: -5, type: "dirt" }] };
+        level = { objects: [{ x: 0, y: -5, type: "dirt" }] };
+        x = 0.5;
+        y = 0;
+        document.getElementById("parInput").value = "";
+        document.getElementById("showDeaths").checked = "";
+    }
+});
+
+async function load(code) {
     try {
-        let saveCodeCompressed = prompt("Paste your save code here.");
+        let saveCodeCompressed;
+        if (JSON.stringify(level) != '{"objects":[{"x":0,"y":-5,"type":"dirt"}]}') {
+            if (confirm("This will reset any unsaved progress. Do you want to continue?")) {
+                if (!code) {
+                    saveCodeCompressed = prompt("Paste your save code here.");
+                }
+            } else {
+                return;
+            }
+        }
+        if (code) {
+            saveCodeCompressed = code;
+        } else if (!saveCodeCompressed) {
+            saveCodeCompressed = prompt("Paste your save code here.");
+        }
         let uint8arrayCompressed = new Uint8Array(saveCodeCompressed.length / 2);
         let i = 0;
         for (byte of [...saveCodeCompressed.matchAll(/../g)]) {
@@ -256,7 +286,8 @@ async function load() {
         if (mode != 1) {
             startGame();
         }
-    } catch {
+    } catch (e) {
+        console.log(e)
         alert("Invalid save code.");
     }
 }
@@ -340,65 +371,61 @@ canvas.addEventListener("touchend", () => {
 
 function placeTile() {
     if (mode == 1 && mousedown && !moveOnTouch) {
+        tileX = (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 && x % 5 != 0 ? 1 : 0)) * 5;
+        tileY = (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5;
         if (
-            tileX != (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5 ||
-            tileY != (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5
+            (!(x < tileX + 5 &&
+                x + 4 > tileX &&
+                y < tileY + 5 &&
+                y + 4 > tileY
+            ) || (currentTile == "coin" || currentTile == "eraser")) &&
+            !(tileX == 0 && tileY == 0) &&
+            tileY >= -125
         ) {
-            tileX = (Math.floor((mouseX / height - ((4.155 - x % 5) / 100)) * 20) + Math.floor(x / 5) - 12 + (x < 0 ? 1 : 0)) * 5;
-            tileY = (-Math.floor((mouseY / height - ((2.5 + y % 5) / 100)) * 20) + Math.floor(y / 5) + 9 + (y % 5 != 0 && y < 0 ? 1 : 0)) * 5;
-            if (
-                !(x < tileX + 5 &&
-                    x + 4 > tileX &&
-                    y < tileY + 5 &&
-                    y + 4 > tileY
-                ) &&
-                !(tileX == 0 && tileY == 0) &&
-                tileY >= -125
-            ) {
-                let i = 0;
-                for (object of originalLevel.objects) {
-                    if (
-                        object.x == tileX &&
-                        object.y == tileY
-                    ) {
-                        if (
-                            !(object.x == 0 && object.y == -5 &&
-                                (
-                                    currentTile == "redflag" ||
-                                    currentTile == "end" ||
-                                    currentTile == "coin" ||
-                                    currentTile == "eraser" ||
-                                    currentTile == "spike" ||
-                                    currentTile == "lava" ||
-                                    currentTile == "enemy"
-                                ))
-                        ) {
-                            originalLevel.objects.splice(i, 1);
-                        }
-                        break;
-                    }
-                    i++;
-                }
+            let i = 0;
+            for (object of originalLevel.objects) {
                 if (
-                    currentTile != "eraser" &&
-                    !(
-                        tileX == 0 &&
-                        tileY == -5 &&
-                        (
-                            currentTile == "redflag" ||
-                            currentTile == "end" ||
-                            currentTile == "coin" ||
-                            currentTile == "spike" ||
-                            currentTile == "lava" ||
-                            currentTile == "enemy"
-                        )
-                    )
+                    object.x == tileX &&
+                    object.y == tileY
                 ) {
-                    originalLevel.objects.push({ x: tileX, y: tileY, type: currentTile });
+                    if (
+                        !(object.x == 0 && object.y == -5 &&
+                            (
+                                currentTile == "redflag" ||
+                                currentTile == "end" ||
+                                currentTile == "coin" ||
+                                currentTile == "eraser" ||
+                                currentTile == "spike" ||
+                                currentTile == "lava" ||
+                                currentTile == "enemy"
+                            ))
+                    ) {
+                        originalLevel.objects.splice(i, 1);
+                    }
+                    break;
                 }
-                level = JSON.parse(JSON.stringify(originalLevel));
+                i++;
             }
+            if (
+                currentTile != "eraser" &&
+                !(
+                    tileX == 0 &&
+                    tileY == -5 &&
+                    (
+                        currentTile == "redflag" ||
+                        currentTile == "end" ||
+                        currentTile == "coin" ||
+                        currentTile == "spike" ||
+                        currentTile == "lava" ||
+                        currentTile == "enemy"
+                    )
+                )
+            ) {
+                originalLevel.objects.push({ x: tileX, y: tileY, type: currentTile });
+            }
+            level = JSON.parse(JSON.stringify(originalLevel));
         }
+
     }
 }
 
@@ -411,7 +438,6 @@ function startGame() {
         document.getElementById("edit").style.display = "none";
     } else if (mode == 1) {
         document.getElementById("ingameMenu").style.display = "none";
-        level = Object.assign({}, originalLevel);
     } else if (mode == 2) {
         document.getElementById("ingameMenu").style.display = "";
         document.getElementById("quit").style.display = "none";
@@ -429,6 +455,7 @@ function startGame() {
     yVelocity = 0;
     coins = 0;
     totalCoins = 0;
+    deaths = 0;
     for (let coin of level.objects) {
         if (coin.type == "coin") {
             totalCoins++;
@@ -622,14 +649,26 @@ function gameLoop() {
                     let atLedge = true;
                     for (notGap of level.objects) {
                         if (
-                            Math.round(notGap.x / 5) == (wall.direction == -1 ? Math.floor((wall.x + wall.direction / 10) / 5) : Math.ceil((wall.x + wall.direction / 5) / 5)) &&
-                            notGap.y == wall.y - 5
+                            (Math.round(notGap.x / 5) == (wall.direction == -1 ? Math.floor((wall.x + wall.direction / 10) / 5) : Math.ceil((wall.x + wall.direction / 5) / 5)) &&
+                                notGap.y == wall.y - 5) &&
+                            notGap.type != "coin" &&
+                            notGap.type != "springup" &&
+                            notGap.type != "springdown" &&
+                            notGap.type != "redflag" &&
+                            notGap.type != "greenflag" &&
+                            notGap.type != "end"
                         ) {
                             atLedge = false;
                         }
                         if (
                             notGap.x / 5 == (wall.direction == -1 ? Math.floor((wall.x + wall.direction / 10) / 5) : Math.ceil((wall.x + wall.direction / 5) / 5)) &&
-                            notGap.y == wall.y
+                            notGap.y == wall.y &&
+                            notGap.type != "coin" &&
+                            notGap.type != "springup" &&
+                            notGap.type != "springdown" &&
+                            notGap.type != "redflag" &&
+                            notGap.type != "greenflag" &&
+                            notGap.type != "end"
                         ) {
                             atLedge = true;
                             break;
@@ -765,6 +804,12 @@ function gameLoop() {
         } else {
             document.getElementById("finalCoins").textContent = "";
         }
+        if (level.showDeaths) {
+            document.getElementById("deathCount").style.display = "";
+            document.getElementById("deathCount").textContent = "Deaths: " + deaths;
+        } else {
+            document.getElementById("deathCount").style.display = "none";
+        }
         document.getElementById("ingameMenu").style.display = "none";
         document.getElementById("winScreen").style.display = "";
     } else if (mode == -5) {
@@ -777,6 +822,12 @@ function gameLoop() {
         } else {
             document.getElementById("finalCoins").textContent = "";
         }
+        if (level.showDeaths) {
+            document.getElementById("deathCount").style.display = "";
+            document.getElementById("deathCount").textContent = "Deaths: " + deaths;
+        } else {
+            document.getElementById("deathCount").style.display = "none";
+        }
         document.getElementById("ingameMenu").style.display = "none";
         document.getElementById("winScreen").style.display = "";
     } else {
@@ -786,11 +837,11 @@ function gameLoop() {
 
 function gameOver() {
     if (checkpointX == 0.5 && checkpointY == 0) {
-        level = Object.assign({}, originalLevel);
+        level = JSON.parse(JSON.stringify(originalLevel));
         coins = 0;
         document.getElementById("coinCount").textContent = "0/" + totalCoins;
-        timePlayed = performance.now();
     }
+    deaths++;
     x = checkpointX;
     y = checkpointY;
 }
