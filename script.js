@@ -554,7 +554,7 @@ function gameLoop() {
             yVelocity = 1;
             onGround = false;
         }
-        if (!onGround && yVelocity > -5) {
+        if (!onGround && yVelocity > -2) {
             yVelocity -= 0.04
         }
         if (yVelocity > 0) {
@@ -627,6 +627,27 @@ function gameLoop() {
                         { x: wall.x, y: wall.y },
                         { x: wall.x + 5, y: wall.y },
                         { x: wall.x + 2.5, y: wall.y + 5 }
+                    ]
+                };
+                if (detectCollision(square, triangle)) {
+                    gameOver();
+                }
+            } else if (wall.type == "ceiling-spike") {
+                const square = {
+                    x: x, y: y, size: 4,
+                    corners: [
+                        { x: x, y: y },
+                        { x: x + 4, y: y },
+                        { x: x + 4, y: y + 4 },
+                        { x: x, y: y + 4 }
+                    ]
+                };
+
+                const triangle = {
+                    vertices: [
+                        { x: wall.x, y: wall.y + 5 },
+                        { x: wall.x + 5, y: wall.y + 5 },
+                        { x: wall.x + 2.5, y: wall.y }
                     ]
                 };
                 if (detectCollision(square, triangle)) {
