@@ -687,8 +687,6 @@ function gameLoop() {
                             notGap.type != "coin" &&
                             notGap.type != "springup" &&
                             notGap.type != "springdown" &&
-                            notGap.type != "redflag" &&
-                            notGap.type != "greenflag" &&
                             notGap.type != "end"
                         ) {
                             atLedge = true;
