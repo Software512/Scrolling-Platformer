@@ -145,31 +145,27 @@ document.addEventListener("keydown", (e) => {
     document.getElementById("move").style.boxShadow = "";
     document.getElementById(currentTile).style.boxShadow = "0 0 5px 5px #ccc";
     if (document.getElementById("levelOptions").style.display == "none") {
-        if (e.key == "ArrowLeft" || e.key == "a") {
+        if (e.key == "ArrowLeft" || e.key == "a" || e.key == "A") {
             leftDown = true;
-        } else if (e.key == "ArrowRight" || e.key == "d") {
+        } else if (e.key == "ArrowRight" || e.key == "d" || e.key == "D") {
             rightDown = true;
-        } else if (e.key == "ArrowUp" || e.key == "w") {
+        } else if (e.key == "ArrowUp" || e.key == "w" || e.key == "W") {
             upDown = true;
-        } else if (e.key == "ArrowDown" || e.key == "s") {
+        } else if (e.key == "ArrowDown" || e.key == "s" || e.key == "S") {
             downDown = true;
-        } else if (e.key == "r") {
-            x = 0.5;
-            y = 0;
-            level = JSON.parse(JSON.stringify(originalLevel));
         }
     }
 
 });
 
 document.addEventListener("keyup", (e) => {
-    if (e.key == "ArrowLeft" || e.key == "a") {
+    if (e.key == "ArrowLeft" || e.key == "a" || e.key == "A") {
         leftDown = false;
-    } else if (e.key == "ArrowRight" || e.key == "d") {
+    } else if (e.key == "ArrowRight" || e.key == "d" || e.key == "D") {
         rightDown = false;
-    } else if (e.key == "ArrowUp" || e.key == "w") {
+    } else if (e.key == "ArrowUp" || e.key == "w" || e.key == "W") {
         upDown = false;
-    } else if (e.key == "ArrowDown" || e.key == "s") {
+    } else if (e.key == "ArrowDown" || e.key == "s" || e.key == "S") {
         downDown = false;
     }
 });
@@ -534,7 +530,7 @@ function gameLoop() {
         }
         xVelocity = Math.round(xVelocity * 1000) / 1000
         for (wall of level.objects) {
-            if (wall.type == "dirt" || wall.type == "grass") {
+            if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
                 if (
                     x < wall.x + 5 &&
                     x + 4 > wall.x &&
@@ -559,7 +555,7 @@ function gameLoop() {
         }
         if (yVelocity > 0) {
             for (wall of level.objects) {
-                if (wall.type == "dirt" || wall.type == "grass") {
+                if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
                     if (
                         x < wall.x + 5 &&
                         x + 4 > wall.x &&
@@ -575,7 +571,7 @@ function gameLoop() {
         // Normalization? no
         y += yVelocity
         for (wall of level.objects) {
-            if (wall.type == "dirt" || wall.type == "grass") {
+            if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
                 if (
                     x + xVelocity < wall.x + 5 &&
                     x + xVelocity + 4 > wall.x &&
