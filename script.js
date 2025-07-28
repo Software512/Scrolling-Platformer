@@ -80,6 +80,16 @@ document.getElementById("newGame").addEventListener("click", () => {
     document.getElementById("dirt").style.boxShadow = "0 0 5px 5px #ccc";
 });
 
+document.getElementById("openCredits").addEventListener("click", () => {
+    document.getElementById("mainMenu").style.display = "none";
+    document.getElementById("creditScreen").style.display = "";
+});
+
+document.getElementById("closeCredits").addEventListener("click", () => {
+    document.getElementById("mainMenu").style.display = "";
+    document.getElementById("creditScreen").style.display = "none";
+});
+
 document.getElementById("leaveEditor").addEventListener("click", () => {
     mode = -1;
     document.getElementById("editorMenu").style.display = "none";
@@ -130,19 +140,22 @@ document.addEventListener("keydown", (e) => {
     document.getElementById("move").style.backgroundColor = "";
     document.getElementById("move").style.boxShadow = "";
     document.getElementById(currentTile).style.boxShadow = "0 0 5px 5px #ccc";
-    if (e.key == "ArrowLeft" || e.key == "a") {
-        leftDown = true;
-    } else if (e.key == "ArrowRight" || e.key == "d") {
-        rightDown = true;
-    } else if (e.key == "ArrowUp" || e.key == "w") {
-        upDown = true;
-    } else if (e.key == "ArrowDown" || e.key == "s") {
-        downDown = true;
-    } else if (e.key == "r") {
-        x = 0.5;
-        y = 0;
-        level = JSON.parse(JSON.stringify(originalLevel));
+    if (document.getElementById("levelOptions").style.display == "none") {
+        if (e.key == "ArrowLeft" || e.key == "a") {
+            leftDown = true;
+        } else if (e.key == "ArrowRight" || e.key == "d") {
+            rightDown = true;
+        } else if (e.key == "ArrowUp" || e.key == "w") {
+            upDown = true;
+        } else if (e.key == "ArrowDown" || e.key == "s") {
+            downDown = true;
+        } else if (e.key == "r") {
+            x = 0.5;
+            y = 0;
+            level = JSON.parse(JSON.stringify(originalLevel));
+        }
     }
+
 });
 
 document.addEventListener("keyup", (e) => {
@@ -193,7 +206,20 @@ document.getElementById("testGame").addEventListener("click", () => {
     mode = -2;
 });
 
+document.getElementById("levelOptionsButton").addEventListener("click", () => {
+    if (level.par) document.getElementById("parInput").value = level.par;
+    document.getElementById("levelOptions").style.display = "";
+    document.getElementById("levelOptionsOverlay").style.display = "";
+});
 
+document.getElementById("closeLevelOptions").addEventListener("click", () => {
+    document.getElementById("levelOptions").style.display = "none";
+    document.getElementById("levelOptionsOverlay").style.display = "none";
+});
+
+document.getElementById("parInput").addEventListener("input", (e) => {
+    originalLevel.par = e.target.value;
+});
 
 document.getElementById("save").addEventListener("click", () => {
     let compressedData;
@@ -693,7 +719,14 @@ function gameLoop() {
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
         if (wall.type == "lava") {
-            ctx.drawImage(document.getElementById(wall.type), Math.floor(timePassed) * 512, 0, 512, 512, (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
+            let image = "lava";
+            for (lava of level.objects) {
+                if (lava.type == "lava" && lava.x == wall.x && lava.y == wall.y + 5) {
+                    image = "lava-full";
+                    break;
+                }
+            }
+            ctx.drawImage(document.getElementById(image), Math.floor(timePassed) * 512, 0, 512, 512, (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
         } else {
             ctx.drawImage(document.getElementById(wall.type), (wall.x - x) * (height / 100) + (width / 2 - height / 40), (y - wall.y) * (height / 100) + (height * 0.475), height / 19.7, height / 19.7);
         }
@@ -724,7 +757,7 @@ function gameLoop() {
         startGame();
     } else if (mode == -4) {
         let finalTime = performance.now() - timePlayed;
-        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000);
+        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000) + (level.par ? " Par: " + level.par : "");
         document.getElementById("leaveWinScreenToEditor").style.display = "none";
         document.getElementById("leaveWinScreen").style.display = "";
         if (totalCoins) {
@@ -736,7 +769,7 @@ function gameLoop() {
         document.getElementById("winScreen").style.display = "";
     } else if (mode == -5) {
         let finalTime = performance.now() - timePlayed;
-        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000);
+        document.getElementById("time").textContent = "Time: " + Math.floor(finalTime / 60000) + ":" + (Math.floor((finalTime % 60000) / 1000).toString().length == 1 ? "0" : "") + Math.floor((finalTime % 60000) / 1000) + (level.par ? " Par: " + level.par : "");;
         document.getElementById("leaveWinScreenToEditor").style.display = "";
         document.getElementById("leaveWinScreen").style.display = "none";
         if (totalCoins) {

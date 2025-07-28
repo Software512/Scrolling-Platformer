@@ -22,6 +22,12 @@
 
         h1 {
             margin-bottom: 4%;
+            font-size: 1.5em;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-top: 5%;
         }
 
         #canvas {
@@ -37,7 +43,9 @@
             #mainMenu,
             #editorMenu,
             #ingameMenu,
-            #winScreen {
+            #winScreen,
+            #creditScreen,
+            #levelOptionsOverlay {
                 height: 100vh;
                 left: calc((100vw - (100vh * 4 / 3)) / 2);
             }
@@ -51,7 +59,9 @@
             #mainMenu,
             #editorMenu,
             #ingameMenu,
-            #winScreen {
+            #winScreen,
+            #creditScreen,
+            #levelOptionsOverlay {
                 width: 100vw;
                 top: calc((100vh - (100vw * 3 / 4)) / 2);
             }
@@ -60,15 +70,20 @@
         #mainMenu,
         #editorMenu,
         #ingameMenu,
-        #winScreen {
+        #winScreen,
+        #creditScreen,
+        #levelOptionsOverlay {
             aspect-ratio: 4/3;
             position: fixed;
         }
 
         #mainMenu button,
-        #winScreen button {
+        #winScreen button,
+        #creditScreen button,
+        #levelOptions button {
             padding: 1%;
             margin-bottom: 1%;
+            width: 30%;
         }
 
         #ingameMenu button {
@@ -162,6 +177,35 @@
             width: 1.5em;
             margin-right: 0.4em;
         }
+
+        #openCredits {
+            margin-top: 5%;
+        }
+
+        #closeCredits {
+            margin-top: 1%;
+        }
+
+        #levelOptions {
+            position: absolute;
+            width: 50%;
+            height: 48%;
+            padding-top: 2%;
+            top: 25%;
+            left: 25%;
+            background-color: white;
+            border-radius: 3% 4%;
+            pointer-events: auto;
+        }
+
+        #levelOptionsOverlay {
+            background-color: #0000007F;
+            pointer-events: auto;
+        }
+
+        #levelOptions button {
+            margin-top: 5%;
+        }
     </style>
 </head>
 
@@ -171,7 +215,18 @@
         <h1>Scrolling Platformer Creator</h1>
         <button id="play">Play</button> <br>
         <button id="newGame">Make a New Level</button> <br>
-        <button id="load">Load a Level</button>
+        <button id="load">Load a Level</button> <br>
+        <button id="openCredits">Credits</button>
+    </div>
+    <div id="creditScreen" style="display: none;">
+        <h1>Credits</h1>
+        <p>Made by <a href="https://github.com/Software512" target="_blank" rel="noopener">Software512</a></p>
+        <p><a href="https://fonts.google.com/specimen/Press+Start+2P" target="_blank" rel="noopener">Font</a> by
+            CodeMan38</p>
+        <h2>AI Generated Code:</h2>
+        <p>Most of level compression & decompression, <br>
+            and spike collision detection.</p>
+        <button id="closeCredits">Close</button>
     </div>
     <div id="editorMenu" style="display: none;">
         <div id="editOptions">
@@ -180,8 +235,9 @@
             <button id="goToStart">Go To Start</button>
             <button id="save">Copy Save Code</button>
             <button id="loadToEditor">Load</button>
+            <button id="levelOptionsButton">Level Options</button>
             <div id="flyBox">
-                <label id="flyLabel" for="fly">Fly and Noclip in editor</label>
+                <label id="flyLabel" for="fly">Fly + Noclip</label>
                 <input id="fly" type="checkbox">
             </div>
         </div>
@@ -193,6 +249,7 @@
             <img id="springdown" class="objectButton" alt="Down Spring" src="assets/springdown.webp">
             <img id="spike" class="objectButton" alt="Spike" src="assets/spike.webp">
             <img id="lava" class="objectButton" alt="Lava" src="assets/lava.webp">
+            <img id="lava-full" class="objectButton" style="display: none;" src="assets/lava-full.webp">
             <img id="enemy" class="objectButton" alt="Enemy" src="assets/enemy.webp">
             <img id="coin" class="objectButton" alt="Coin" src="assets/coin.webp">
             <img id="redflag" class="objectButton" alt="Checkpoint" src="assets/redflag.webp">
@@ -201,7 +258,12 @@
             <img id="eraser" class="objectButton" alt="Eraser" src="assets/eraser.webp">
             <img id="move" style="display: none;" alt="Move Your Player In Editor" src="assets/move.webp">
         </div>
-
+    </div>
+    <div id="levelOptionsOverlay" style="display: none;"></div>
+    <div id="levelOptions" style="display: none;">
+        <label id="parLabel" for="parInput">Par &lpar;Accepts any text&rpar;</label>
+        <input id="parInput" min="1">
+        <button id="closeLevelOptions">Close</button>
     </div>
     <div id="ingameMenu" style="display: none;">
         <button id="quit" style="display: none;">Quit</button>
@@ -216,7 +278,7 @@
         <p id="time"></p>
         <p id="finalCoins"></p>
         <button id="leaveWinScreen">Main Menu</button>
-        <button id="leaveWinScreenToEditor">Back to Editor</button>
+        <button id="leaveWinScreenToEditor">Back to Editor</button> <br>
         <button id="replay">Replay</button>
     </div>
 
