@@ -599,7 +599,6 @@ function gameLoop() {
                     y + 4 > wall.y
                 ) {
                     yVelocity = 1.75;
-                    break;
                 }
             } else if (wall.type == "springdown") {
                 if (
@@ -609,7 +608,6 @@ function gameLoop() {
                     y + 4 > wall.y + 1.875
                 ) {
                     yVelocity = -1.75;
-                    break;
                 }
             } else if (wall.type == "spike") {
                 const square = {
