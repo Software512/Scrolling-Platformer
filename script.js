@@ -197,6 +197,8 @@ document.getElementById("goToStart").addEventListener("click", () => {
 });
 
 document.getElementById("fly").addEventListener("input", (e) => {
+    xVelocity = 0;
+    yVelocity = 0;
     if (e.target.checked) {
         fly = true;
     } else {
