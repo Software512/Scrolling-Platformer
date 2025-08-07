@@ -557,7 +557,7 @@ function gameLoop() {
             onGround = false;
         }
         if (!onGround && yVelocity > -2) {
-            yVelocity -= 0.04
+            yVelocity -= 0.04;
         }
         if (yVelocity > 0) {
             for (wall of level.objects) {
@@ -575,8 +575,11 @@ function gameLoop() {
             }
         }
         // Normalization? no
-        y += yVelocity
+        y += yVelocity;
         for (wall of level.objects) {
+            if (wall.type != "enemy" && Math.abs(x - wall.x) > 10 && Math.abs(y - wall.y) > 10) {
+                continue;
+            }
             if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
                 if (
                     x + xVelocity < wall.x + 5 &&
@@ -776,6 +779,9 @@ function gameLoop() {
     ctx.globalAlpha = 1;
     ctx.fillRect(width / 2 - height / 40, height * 0.485, height / 25, height / 25);
     for (wall of level.objects) {
+        if (Math.abs(x - wall.x) > 40 && Math.abs(y - wall.y) > 60) {
+            continue;
+        }
         if (wall.type == "lava") {
             let image = "lava";
             for (lava of level.objects) {
