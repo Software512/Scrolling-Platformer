@@ -875,6 +875,8 @@ function gameOver() {
     deaths++;
     x = checkpointX;
     y = checkpointY;
+    xVelocity = 0;
+    yVelocity = 0;
 }
 
 // All of the following code is AI-generated.
