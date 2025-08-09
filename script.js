@@ -607,7 +607,8 @@ function gameLoop() {
                     x < wall.x + 5 &&
                     x + 4 > wall.x &&
                     y < wall.y + 3.125 &&
-                    y + 4 > wall.y
+                    y + 4 > wall.y &&
+                    !onGround
                 ) {
                     yVelocity = 1.75;
                 }
