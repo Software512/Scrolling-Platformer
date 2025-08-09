@@ -266,6 +266,9 @@ async function load(code) {
             if (confirm("This will reset any unsaved progress. Do you want to continue?")) {
                 if (!code) {
                     saveCodeCompressed = prompt("Paste your save code here.");
+                    if (!saveCodeCompressed) {
+                        return;
+                    }
                 }
             } else {
                 return;
@@ -275,6 +278,9 @@ async function load(code) {
             saveCodeCompressed = code;
         } else if (!saveCodeCompressed) {
             saveCodeCompressed = prompt("Paste your save code here.");
+            if (!saveCodeCompressed) {
+                return;
+            }
         }
         let uint8arrayCompressed = new Uint8Array(saveCodeCompressed.length / 2);
         let i = 0;
@@ -285,11 +291,12 @@ async function load(code) {
         let saveCode = await decompressString(uint8arrayCompressed);
         originalLevel = JSON.parse(saveCode);
         level = JSON.parse(JSON.stringify(originalLevel));
+        x = 0.5;
+        y = 0;
         if (mode != 1) {
             startGame();
         }
-    } catch (e) {
-        console.log(e)
+    } catch {
         alert("Invalid save code.");
     }
 }
@@ -535,23 +542,6 @@ function gameLoop() {
             xVelocity += 0.1;
         }
         xVelocity = Math.round(xVelocity * 1000) / 1000
-        for (wall of level.objects) {
-            if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
-                if (
-                    x < wall.x + 5 &&
-                    x + 4 > wall.x &&
-                    y - 0.04 < wall.y + 5 &&
-                    y - 0.04 + 4 > wall.y
-                ) {
-                    onGround = true;
-                    yVelocity = 0;
-                    y = wall.y + 5;
-                    break;
-                }
-                onGround = false;
-            }
-
-        }
         if (onGround && upDown) {
             yVelocity = 1;
             onGround = false;
@@ -576,6 +566,22 @@ function gameLoop() {
         }
         // Normalization? no
         y += yVelocity;
+        for (wall of level.objects) {
+            if (wall.type == "dirt" || wall.type == "grass" || wall.type == "stone") {
+                if (
+                    x < wall.x + 5 &&
+                    x + 4 > wall.x &&
+                    y - 0.04 < wall.y + 5 &&
+                    y - 0.04 + 4 > wall.y
+                ) {
+                    onGround = true;
+                    yVelocity = 0;
+                    y = wall.y + 5;
+                    break;
+                }
+                onGround = false;
+            }
+        }
         for (wall of level.objects) {
             if (wall.type != "enemy" && Math.abs(x - wall.x) > 10 && Math.abs(y - wall.y) > 10) {
                 continue;
