@@ -1,8 +1,8 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-var level = { objects: [{ x: 0, y: -5, type: "dirt" }] };;
-var originalLevel = { objects: [{ x: 0, y: -5, type: "dirt" }] };
+var level = { objects: [{ x: 0, y: -5, type: "grass" }] };;
+var originalLevel = { objects: [{ x: 0, y: -5, type: "grass" }] };
 var x;
 var y;
 var checkpointX = 0.5;
@@ -42,6 +42,10 @@ var deaths;
 2: testing.
 */
 
+
+if (!CompressionStream) {
+    window.location = "update.html";
+}
 
 resize();
 
@@ -236,8 +240,14 @@ document.getElementById("save").addEventListener("click", () => {
         for (character of compressedData) {
             saveCode += (character.toString(16).length == 1 ? "0" : "") + character.toString(16);
         }
-        navigator.clipboard.writeText(saveCode);
-        alert("Save code copied to clipboard. Paste it somewhere safe.");
+        try {
+            navigator.clipboard.writeText(saveCode);
+            alert("Save code copied to clipboard. Paste it somewhere safe.");
+        } catch {
+            alert("Could not copy to clipboard. Check if the URL begins with https:// and that this page has permissions to the clipboard. Press F12 and open the browser console if you want to get your save code.");
+            console.log("Copy this code to save your level.");
+            console.log(saveCode);
+        }
     });
 });
 
@@ -250,8 +260,8 @@ document.getElementById("load").addEventListener("click", () => {
 
 document.getElementById("resetLevel").addEventListener("click", () => {
     if (confirm("This will reset any unsaved progress. Do you want to continue?")) {
-        originalLevel = { objects: [{ x: 0, y: -5, type: "dirt" }] };
-        level = { objects: [{ x: 0, y: -5, type: "dirt" }] };
+        originalLevel = { objects: [{ x: 0, y: -5, type: "grass" }] };
+        level = { objects: [{ x: 0, y: -5, type: "grass" }] };
         x = 0.5;
         y = 0;
         document.getElementById("parInput").value = "";
@@ -262,7 +272,7 @@ document.getElementById("resetLevel").addEventListener("click", () => {
 async function load(code) {
     try {
         let saveCodeCompressed;
-        if (JSON.stringify(level) != '{"objects":[{"x":0,"y":-5,"type":"dirt"}]}') {
+        if (JSON.stringify(level) != '{"objects":[{"x":0,"y":-5,"type":"grass"}]}') {
             if (confirm("This will reset any unsaved progress. Do you want to continue?")) {
                 if (!code) {
                     saveCodeCompressed = prompt("Paste your save code here.");

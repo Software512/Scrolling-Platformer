@@ -1,0 +1,15 @@
+<svg version="1.1"
+    width="10" height="10"
+    xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+        <image
+            href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAADtklEQVR4AeycMY4UMRBFTaebIQIOQExMQAQBEVfjCIizcAREiIiJyHbTXTnoZKSWe/rbLlfVW8lqTY/L9ev/p056tNvnH1+eWXYefPj28VlZanZb4S+1AwCQOv5SAAAAkjuQfHyeAACQ3IHk4/MESArAPjYA7E4kvQJA0uD3sQFgdyLpFQCSBr+PDQC7E0mvAJA0+H1sANidSHoFgGTB345rDsDj/8eirNuBvH1+eP1QlKXOaw6AOgD1mgMAoPnnvhoA3EeoDQAAmn/uqwHAfYTaAACg+ee+GgDcR3hugKNdAHDkTJL7AJAk6KMxAeDImST3ASBJ0EdjAsCRM0nuA0CSoI/GBIAjZ5LcB4DgQbfGkwH49POpKOvr71dFWa0BR3//5vvfoizFu1qrzicDoAqg3tYBALD137w7AJhHYCsAAGz9N+8OAOYR2AoAAFv/zbsDgHkEYwScPRUAzjoVdB8ABA327FgAcNapoPsAIGiwZ8cCgLNOBd0HAEGDPTsWAJx1Kug+AAgW7L3jbPWdsrLubdh7v6K91irv8mvt+3dvi7JUP+oMyuIJoCbgvB4AnAeoygcA1UHn9QDgPEBVPgCoDjqvBwDnAaryAUB1cJH6qzIA4KpzQeoAIEiQV8cAgKvOBakDgCBBXh0DAK46F6QOAIIEeXUMALjqXJA6AHAepCp/+/XnX1GWKsC6XnmXX2ut9av9eQKoDjqvBwDnAaryAUB10Hk9ADgPUJUPAKqDzusBwHmAqnwAUB00qu/VFgB6Oen0HABwGlwv2QDQy0mn5wCA0+B6yQaAXk46PQcAnAbXSzYA9HLS6TkA4Cy43nK3+k5bWaog5bcItVbtn72eJ0ByAgAAAJI7kHx8ngAAkNyB5OPzBACA5A44GX+UTJ4Ao5x1ci4AOAlqlEwAGOWsk3MBwElQo2QCwChnnZwLAE6CGiUTAEY56+RcAFg8qNHyAGC0w43z628alNU4vvk1ADQtir0BAGLn25wOAJoWxd4AALHzbU4HAE2LYm8AgNj5NqcDgKZFNhtmdQWAWU4v2gcAFg1mliwAmOX0on0AYNFgZskCgFlOL9oHABYNZpYsAJjl9KJ9AGCxYGbLMQdA+d8EtXa2Ybf9lHf5tbbOoKxbPfd+NgfgXsHs7+sAAPT1091pAOAusr6CAaCvn+5OAwB3kfUVDAB9/XR3GgAsEpmVDACwcn6RvgCwSBBWMgDAyvlF+gLAIkFYyQAAK+cX6QsAiwRhJQMArJxfpC8AGAdh3f4FAAD//0UBoa8AAAAGSURBVAMAy6Lr/11aTs0AAAAASUVORK5CYII="
+            width="5" height="5" y="5" id="grass"></image>
+    </defs>
+
+    <rect width="10" height="10" fill="skyblue"></rect>
+    <rect x="3" y="1" width="4" height="4" fill="black"></rect>
+    <use href="#grass"></use>
+    <use href="#grass" x="5"></use>
+</svg>
