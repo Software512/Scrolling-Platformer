@@ -104,8 +104,8 @@ document.getElementById("quit").addEventListener("click", () => {
     mode = -1;
     document.getElementById("ingameMenu").style.display = "none";
     document.getElementById("mainMenu").style.display = "";
-    level = { objects: [{ x: 0, y: -5, type: "dirt" }] };;
-    originalLevel = { objects: [{ x: 0, y: -5, type: "dirt" }] };
+    level = { objects: [{ x: 0, y: -5, type: "grass" }] };;
+    originalLevel = { objects: [{ x: 0, y: -5, type: "grass" }] };
 });
 
 document.getElementById("showDeaths").addEventListener("input", (e) => {
