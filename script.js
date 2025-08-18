@@ -43,7 +43,7 @@ var deaths;
 */
 
 
-if (!CompressionStream) {
+if (typeof CompressionStream == "undefined") {
     window.location = "update.html";
 }
 
