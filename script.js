@@ -930,14 +930,11 @@ async function compressString(input) {
 }
 
 async function decompressString(compressedData) {
-    // Convert the compressed string (Base64 or similar) back to a Uint8Array
-    //const compressedBytes = Uint8Array.from(atob(compressedData), c => c.charCodeAt(0));
-    const compressedBytes = compressedData;
     // Create a DecompressionStream (e.g., for 'gzip')
     const decompressionStream = new DecompressionStream('gzip');
 
     // Create a stream from the compressed bytes
-    const compressedStream = new Response(compressedBytes).body;
+    const compressedStream = new Response(compressedData).body;
 
     // Pipe the compressed stream through the decompression stream
     const decompressedStream = compressedStream.pipeThrough(decompressionStream);
@@ -950,11 +947,11 @@ async function decompressString(compressedData) {
 
 
 // Helper function to check if a point is inside a triangle
-function isPointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
-    const areaOrig = Math.abs((bx - ax) * (cy - ay) - (cx - ax) * (by - ay));
-    const area1 = Math.abs((ax - px) * (by - py) - (bx - px) * (ay - py));
-    const area2 = Math.abs((bx - px) * (cy - py) - (cx - px) * (by - py));
-    const area3 = Math.abs((cx - px) * (ay - py) - (ax - px) * (cy - py));
+function isPointInTriangle(px, py, a, b, c) {
+    const areaOrig = Math.abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y));
+    const area1 = Math.abs((a.x - px) * (b.y - py) - (b.x - px) * (a.y - py));
+    const area2 = Math.abs((b.x - px) * (c.y - py) - (c.x - px) * (b.y - py));
+    const area3 = Math.abs((c.x - px) * (a.y - py) - (a.x - px) * (c.y - py));
     return areaOrig === (area1 + area2 + area3);
 }
 
